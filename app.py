@@ -95,7 +95,7 @@ def main():
     col_niveis, col_area = st.columns(2)
     with col_niveis:
         # Seleção múltipla para os níveis de curso
-        niveis = st.multiselect('Selecione os tipos de programa de pós-graduação que deseja', 
+        niveis = st.multiselect('Tipos de graduação/pós-graduação', 
                                 sorted(data['Nivel_Programa'].unique()), 
                                 default=[])
         # Filtrando dados com base na seleção de níveis
@@ -103,7 +103,7 @@ def main():
 
     with col_area:
         # Multiselect para Área de Conhecimento
-        areas_conhecimento = st.multiselect('Área de conhecimento do programa de pós-graduação', 
+        areas_conhecimento = st.multiselect('Área de conhecimento', 
                                             sorted(data['Area_Conhecimento'].unique()), 
                                             default=[])
         st.caption('__Atenção:__ Se você está buscando promoção na carreira na sua IFES, observe se esta informação está alinhada com seu ambiente organizacional')
@@ -113,7 +113,7 @@ def main():
 
 
     # Multiselect para as notas CAPES
-    notas_capes = st.multiselect('Nota/Conceito do programa de pós-graduação segundo a CAPES', 
+    notas_capes = st.multiselect('Avaliação CAPES', 
                                 sorted(data_areas['Nota_Conceito'].unique()), 
                                 default=[])
     data_notas = data_areas if not notas_capes else data_areas[data_areas['Nota_Conceito'].isin(notas_capes)]
@@ -139,7 +139,7 @@ def main():
             municipios_opcoes = sorted(data_atual['Municipio'].unique())
 
         # Multiselect para Município
-        municipios = st.multiselect('Município sede do programa de pós-graduação', 
+        municipios = st.multiselect('Município', 
                                     municipios_opcoes, 
                                     default=[])
         # Filtrando dados com base na seleção de municípios
@@ -184,7 +184,8 @@ def main():
                                     'Modalidade']])
     
 
-    st.markdown("Utilize os botões abaixo se desejar baixar os dados da tabela acima :red[(primeiro botão)] ou baixar a base de dados orignal com todos os programas de mestrado e doutorado das universidades públicas do Brasil :blue[(segundo botão)]")
+    st.markdown(""" ---
+    Utilize os botões abaixo se desejar baixar os dados da tabela acima :red[(primeiro botão)] ou baixar a base de dados orignal com todos os programas de mestrado e doutorado das universidades públicas do Brasil :blue[(segundo botão)]""")
     col_download1, col_download2 = st.columns(2)
     with col_download1:
         # Botão para baixar dados filtrados
@@ -193,7 +194,7 @@ def main():
             st.download_button(label="Dados prontos para download. Clique aqui para baixar.", 
                             data=csv, 
                             file_name='Dados_filtrados.csv', 
-                            mime='text/csv')
+                            mime='text/csv')    
     with col_download2:
         # Botão para baixar todos os dados
         if st.button('Planilha CSV com todos os programas do Brasil', type="secondary"):
@@ -202,6 +203,43 @@ def main():
                             data=csv, 
                             file_name='Todos_os_dados.csv', 
                             mime='text/csv')
+    
+    st.markdown(""" ---
+    ### O que eu faço agora? 🌟🚀
+
+    Hey, explorador acadêmico! 🕵️‍♂️🎓 Você acabou de mergulhar num oceano de opções incríveis sobre graduações e pós-graduações em universidades públicas brasileiras. Mas, peraí, você deve estar se perguntando: "E agora, o que eu faço com todas essas infos?" 🤔
+
+    Não se preocupe, eu te guio nessa! 🌈✨
+
+    1. **Google é seu novo BFF!** 🌐👯
+    - Infelizmente, a CAPES, apesar de ser super legal fornecendo dados, não nos deu links diretos. 😞
+    - Mas hey, isso não é um beco sem saída! Use o poderoso Google para buscar mais sobre os cursos que chamaram sua atenção. Digite o nome da universidade e do curso e... Voilà! Informações fresquinhas ao seu dispor.
+
+    2. **Amantes de Planilhas, Uni-vos!** 📊💻
+    - Se você curte uma boa planilha (quem não, né?), temos um presentão! 🎁
+    - Você pode baixar **os dados que estão na tela** para uma análise mais aprofundada. Quer ver todos os detalhes e fazer suas próprias tabelas coloridas? É só clicar e baixar!
+    - E se você é daqueles que adora ter **toda a base de dados**, temos isso também! Baixe a base completa e sinta-se como um cientista de dados descobrindo novos mundos.
+
+    Então, é isso! Mergulhe fundo nessa busca, jovem padawan! Que a força do conhecimento esteja com você! 🌌👩‍🚀
+
+    Lembre-se: cada clique é um passo em sua jornada acadêmica. Vá em frente e descubra as maravilhas das universidades públicas do Brasil! 🇧🇷🎉
+
+    **Boa jornada!** 🚀🌟
+
+    """)
+
+    # Disclaimer/Avisos legais
+    st.markdown(""" ---
+    #### Disclaimer
+    Este site é uma iniciativa voluntária para facilitar o acesso a informações sobre cursos de graduação, mestrado e doutorado em universidades públicas brasileiras - federais, estaduais e municipais. Criado para superar a dispersão de informações e a dificuldade de encontrar dados específicos em sites individuais de universidades, ele oferece uma solução centralizada. Aqui, você encontra informações extraídas de fontes oficiais como o e-MEC e a Plataforma Sucupira, disponíveis num formato concentrado e de fácil navegação. Nosso objetivo é simplificar a busca por oportunidades acadêmicas, permitindo que você veja todas as opções disponíveis em um único lugar, sem a necessidade de buscas extensas e trabalhosas. Este site é um recurso desenvolvido com dedicação, visando ajudar estudantes e acadêmicos a explorar as possibilidades educacionais nas universidades públicas do Brasil.
+    """)
+
+    # Adicionar o email de contato
+    st.markdown('**Desenvolvido por Erick C. Campos:** [erickcampos50@gmail.com](mailto:erickcampos50@gmail.com)')
+
+    # Adicionar a thumbnail da foto
+    url_foto = "http://servicosweb.cnpq.br/wspessoa/servletrecuperafoto?tipo=1&id=K4239728J7"
+    
 
 
 # %%
