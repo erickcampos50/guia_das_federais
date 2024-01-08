@@ -73,47 +73,7 @@ data_graduacao = load_data_graduacao('graduacao_univ_publicas.csv')
 def show_pos_graduacao():
     
 
-    if st.checkbox("Mostrar instruções detalhadas"):  # Checkbox para mostrar/ocultar instruções
-        st.subheader(" Instruções Detalhadas para Utilizar o Guia das Federais:")
-        st.markdown("""
-        #### 1. **Seleção de Nível do Programa**
-        - **Descrição:** Escolha o nível de pós-graduação que você está procurando (por exemplo, Mestrado, Doutorado).
-        - **Como Fazer:** Clique na caixa de seleção rotulada "Nível do programa de pós-graduação". Uma lista será exibida. Selecione os níveis desejados clicando nos nomes.
-        - **Dica:** Você pode selecionar mais de um nível.
-
-        #### 2. **Escolha de Notas/Conceitos CAPES**
-        - **Descrição:** Filtrar programas pela nota ou conceito atribuído pela CAPES.
-        - **Como Fazer:** Clique na caixa de seleção "Nota/Conceito do programa de pós-graduação". Escolha as notas que são do seu interesse.
-        - **Dica:** Se não tiver uma preferência específica, você pode pular este passo.
-
-        #### 3. **Seleção de Estado**
-        - **Descrição:** Se você está buscando programas em estados específicos, este é o filtro a ser usado.
-        - **Como Fazer:** Clique na caixa de seleção "Sigla da Unidade da Federação do programa" e marque os estados desejados.
-        - **Dica:** Esta opção é útil se você tem uma localização preferencial.
-
-        #### 4. **Filtrar por Município**
-        - **Descrição:** Se desejar buscar programas em cidades específicas, use este filtro.
-        - **Como Fazer:** Selecione o município na caixa correspondente.
-        - **Dica:** Pode ser combinado com o filtro de estado para maior precisão.
-
-        #### 5. **Escolher Área de Conhecimento**
-        - **Descrição:** Filtra os programas pela área de conhecimento (por exemplo, Engenharia, Medicina).
-        - **Como Fazer:** Abra a caixa de seleção "Área de conhecimento do programa de pós-graduação" e escolha as áreas de seu interesse.
-        - **Dica:** Útil para encontrar programas específicos da sua área de interesse.
-
-        #### 6. **Seleção de Instituição (Nome da IES)**
-        - **Descrição:** Se você tem preferência por certas instituições, use este filtro.
-        - **Como Fazer:** Clique na caixa de seleção e marque as instituições de sua escolha.
-        - **Dica:** Ideal para quem deseja estudar em uma universidade específica.
-
-        #### 7. **Visualização dos Resultados**
-        - **Descrição:** Após aplicar os filtros, os resultados serão exibidos em uma tabela.
-        - **Como Fazer:** Role a página para baixo para ver a tabela com os programas que correspondem aos seus filtros.
-        - **Dica:** Você pode reajustar os filtros a qualquer momento para refinar sua busca. """)
-        # st.image("caminho_para_imagem_instrucoes_nivel.jpg")
-        # [demais instruções e imagens]
-
-    
+      
     st.markdown("* **Atenção:** Todos os filtros são opcionais, selecione somente aqueles que desejar e veja os resultados na tabela abaixo. Se nenhum for selecionado, todos os dados estarão disponíveis")
 
     col_niveis, col_area = st.columns(2)
@@ -239,17 +199,17 @@ def show_graduacao():
     col_graus, col_modalidade = st.columns(2)
     with col_graus:
         # Seleção múltipla para os níveis de curso
-        graus = st.multiselect('Tipos de graduação (Licenciatura,Bacharelado, etc.)', 
+        graus = st.multiselect('Tipos de graduação (Licenciatura, Bacharelado, etc.)', 
                                 sorted(data_graduacao['Grau'].unique()), 
-                                default=[])
+                                default=["Bacharelado","Licenciatura"])
         # Filtrando dados com base na seleção de níveis
         data_graus = data_graduacao if not graus else data_graduacao[data_graduacao['Grau'].isin(graus)]
 
     with col_modalidade:
         # Multiselect para Área de Conhecimento
-        modalidade_ensino = st.multiselect('Modalidade de Ensino (Presencial, Remoto, etc.)', 
+        modalidade_ensino = st.multiselect('Modalidade de Ensino (Presencial ou EAD)', 
                                             sorted(data_graduacao['Modalidade_Ensino'].unique()), 
-                                            default=[])
+                                            default=["Educação Presencial"])
         # Filtrando dados com base na seleção de áreas de conhecimento
         data_modalidade = data_graus if not modalidade_ensino else data_graus[data_graus['Modalidade_Ensino'].isin(modalidade_ensino)]
 

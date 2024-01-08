@@ -43,7 +43,7 @@ def filtrar_dados_mec_csv(arquivo_dados_graduacao, arquivo_codigos_graduacao):
         # Preparar um DataFrame vazio para armazenar os dados filtrados
         dados_filtrados = pd.DataFrame()
 
-        categorias_publicas = ["Pública Municipal", "Pública Federal", "Pública Estadual"]
+        categorias_publicas = ["Pública Federal", "Pública Estadual"]
 
         # Processar o arquivo A.csv em pedaços para evitar carregar tudo na memória
         chunksize = 10000  # Ajuste este valor conforme a necessidade
