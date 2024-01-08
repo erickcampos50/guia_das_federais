@@ -11,10 +11,12 @@ st.set_page_config(
     layout="wide",
  )
 # %%
-# Função para carregar os dados do CSV
+# Função para carregar os dados do CSV da pos-graduacao
 @st.cache_data  # Cache para melhorar a performance
 def load_data(csv_file):
-    df = pd.read_csv(csv_file)
+    df = pd.read_csv(csv_file,sep='\t',index_col=None)
+    
+    
     colunas_novas = {
     'Sigla da Instituição de Ensino Superior do programa de pós-graduação': 'Sigla_IES',
     'Nome do programa de pós-graduação': 'Nome_Programa',
@@ -29,26 +31,48 @@ def load_data(csv_file):
     df.rename(columns=colunas_novas, inplace=True)
     df['Nota_Conceito'].fillna("Não informado", inplace=True)
     df['Nota_Conceito'] = df['Nota_Conceito'].astype(str)
-    
 
     return df
+#%%
+
+# Função para carregar os dados do CSV da pos-graduacao
+@st.cache_data  # Cache para melhorar a performance
+def load_data_graduacao(csv_file):
+    df = pd.read_csv(csv_file, sep='\t', index_col=None)
+    
+    # Novo mapeamento de colunas
+    colunas_novas = {
+        'Nome da IES': 'Nome_IES',
+        'Nome do curso': 'Nome_Curso',
+        'Grau': 'Grau',
+        'Área OCDE': 'Area_Conhecimento',
+        'Modalidade de ensino (presencial ou EaD)': 'Modalidade_Ensino',
+        'Município': 'Municipio',
+        'UF': 'UF',
+        }
+    
+    df.rename(columns=colunas_novas, inplace=True)
+
+    # Você pode adicionar aqui qualquer outra operação que deseje realizar no DataFrame
+    # Por exemplo, tratar colunas com valores nulos, converter tipos de dados, etc.
+
+    return df
+
 #%%
 def convert_df_to_csv(df):
     return df.to_csv(index=False).encode('utf-8')
 
 # %%
 # Carregar os dados
-data = load_data('mestrado_doutorado_univ_publicas.csv')
+data_pos = load_data('mestrado_doutorado_univ_publicas.csv')
+data_graduacao = load_data_graduacao('graduacao_univ_publicas.csv')
 
-
-#%%
 
 # %%
-# Interface do Streamlit
-def main():
+# Interface Pós graduação do Streamlit 
+def show_pos_graduacao():
     
-    st.title('Guia das Federais')
-    st.subheader('Explore cursos de graduação, mestrado e doutorado das universidades públicas do Brasil')
+
     if st.checkbox("Mostrar instruções detalhadas"):  # Checkbox para mostrar/ocultar instruções
         st.subheader(" Instruções Detalhadas para Utilizar o Guia das Federais:")
         st.markdown("""
@@ -96,17 +120,17 @@ def main():
     with col_niveis:
         # Seleção múltipla para os níveis de curso
         niveis = st.multiselect('Tipos de graduação/pós-graduação', 
-                                sorted(data['Nivel_Programa'].unique()), 
+                                sorted(data_pos['Nivel_Programa'].unique()), 
                                 default=[])
         # Filtrando dados com base na seleção de níveis
-        data_niveis = data if not niveis else data[data['Nivel_Programa'].isin(niveis)]
+        data_niveis = data_pos if not niveis else data_pos[data_pos['Nivel_Programa'].isin(niveis)]
 
     with col_area:
         # Multiselect para Área de Conhecimento
         areas_conhecimento = st.multiselect('Área de conhecimento', 
-                                            sorted(data['Area_Conhecimento'].unique()), 
+                                            sorted(data_pos['Area_Conhecimento'].unique()), 
                                             default=[])
-        st.caption('__Atenção:__ Se você está buscando promoção na carreira na sua IFES, observe se esta informação está alinhada com seu ambiente organizacional')
+        st.caption('__Atenção aos servidores públicos:__ Observe se esta informação está alinhada com seu ambiente organizacional')
         # Filtrando dados com base na seleção de áreas de conhecimento
         data_areas = data_niveis if not areas_conhecimento else data_niveis[data_niveis['Area_Conhecimento'].isin(areas_conhecimento)]
 
@@ -198,12 +222,142 @@ def main():
     with col_download2:
         # Botão para baixar todos os dados
         if st.button('Planilha CSV com todos os programas do Brasil', type="secondary"):
-            csv = convert_df_to_csv(data)
+            csv = convert_df_to_csv(data_pos)
             st.download_button(label="Dados prontos para download. Clique aqui para baixar.", 
                             data=csv, 
                             file_name='Todos_os_dados.csv', 
                             mime='text/csv')
     
+    
+
+
+# Função para exibir a mensagem de "Em Construção"
+def show_graduacao():
+    
+    st.markdown("* **Atenção:** Todos os filtros são opcionais e você pode escolher vários ao mesmo tempo. Se nenhum for selecionado, todos os dados estarão disponíveis")
+
+    col_graus, col_modalidade = st.columns(2)
+    with col_graus:
+        # Seleção múltipla para os níveis de curso
+        graus = st.multiselect('Tipos de graduação (Licenciatura,Bacharelado, etc.)', 
+                                sorted(data_graduacao['Grau'].unique()), 
+                                default=[])
+        # Filtrando dados com base na seleção de níveis
+        data_graus = data_graduacao if not graus else data_graduacao[data_graduacao['Grau'].isin(graus)]
+
+    with col_modalidade:
+        # Multiselect para Área de Conhecimento
+        modalidade_ensino = st.multiselect('Modalidade de Ensino (Presencial, Remoto, etc.)', 
+                                            sorted(data_graduacao['Modalidade_Ensino'].unique()), 
+                                            default=[])
+        # Filtrando dados com base na seleção de áreas de conhecimento
+        data_modalidade = data_graus if not modalidade_ensino else data_graus[data_graus['Modalidade_Ensino'].isin(modalidade_ensino)]
+
+
+
+
+
+    data_atual_graduacao = data_modalidade
+
+    col_estado, col_municipio = st.columns(2)
+    with col_estado:
+        # Multiselect para estados
+        estados = st.multiselect('Estado/UF', 
+                                sorted(data_atual_graduacao['UF'].unique()), 
+                                default=[])
+        # Filtrando dados com base na seleção de estados
+        data_estados = data_atual_graduacao if not estados else data_atual_graduacao[data_atual_graduacao['UF'].isin(estados)]
+
+
+    with col_municipio:
+        # Condicionando a exibição de municípios com base nos estados selecionados
+        if estados:
+            municipios_opcoes = sorted(data_estados['Municipio'].unique())
+        else:
+            municipios_opcoes = sorted(data_atual_graduacao['Municipio'].unique())
+
+        # Multiselect para Município
+        municipios = st.multiselect('Município da instituição', 
+                                    municipios_opcoes, 
+                                    default=[])
+        # Filtrando dados com base na seleção de municípios
+        data_municipios = data_estados if not municipios else data_estados[data_estados['Municipio'].isin(municipios)]
+    st.caption('Se você tiver selecionado alguum :blue[estado] somente serão exibidos os municípios pertencentes àquele estado. Se nenhum :blue[estado] estiver marcado, serão exibidos todos os municípios')
+
+
+    # Usando 'data_municipios' como base para os próximos filtros
+    data_atual_graduacao = data_municipios
+
+
+    col_nome_ies, col_curso_ies = st.columns(2)
+
+    with col_nome_ies:
+        # Multiselect para nomes das instituições
+        nomes_ies = st.multiselect('Nome da Instituição', 
+                                sorted(data_atual_graduacao['Nome_IES'].unique()), 
+                                default=[])
+        # Filtrando dados com base na seleção de nomes
+        data_nome_ies = data_atual_graduacao if not nomes_ies else data_atual_graduacao[data_atual_graduacao['Nome_IES'].isin(nomes_ies)]
+    
+    with col_curso_ies:
+        # Multiselect para nomes das instituições
+        curso_ies = st.multiselect('Curso', 
+                                sorted(data_nome_ies['Nome_Curso'].unique()), 
+                                default=[])
+        # Filtrando dados com base na seleção de nomes
+        data_curso_ies = data_nome_ies if not curso_ies else data_nome_ies[data_nome_ies['Nome_Curso'].isin(curso_ies)]
+    
+    # Ordenando os dados primeiro por Nome_Programa e depois por Sigla_IES, UF, Município e Modalidade
+    filtered_data_sorted = data_curso_ies.sort_values(by=['Nome_Curso', 'Nome_IES', 'UF', 'Municipio', 'Modalidade_Ensino'])
+
+    # Resetando os índices para não exibi-los
+    filtered_data_sorted.reset_index(drop=True, inplace=True)
+
+    # Exibindo a tabela com os resultados filtrados
+    st.dataframe(filtered_data_sorted[['Nome_Curso', 'Nome_IES', 'UF', 
+                                    'Municipio', 'Modalidade_Ensino','Grau','Area_Conhecimento' ]])
+    
+
+    st.markdown(""" ---
+    Utilize os botões abaixo se desejar baixar os dados da tabela acima :red[(primeiro botão)] ou baixar a base de dados orignal com todos os cursos de graduação das universidades públicas do Brasil :blue[(segundo botão)]""")
+    col_download1, col_download2 = st.columns(2)
+    with col_download1:
+        # Botão para baixar dados filtrados
+        if st.button('Planilha CSV dos dados da tabela acima', type="primary"):
+            csv = convert_df_to_csv(filtered_data_sorted)
+            st.download_button(label="Dados prontos para download. Clique aqui para baixar.", 
+                            data=csv, 
+                            file_name='Dados_filtrados_graduacao.csv', 
+                            mime='text/csv')    
+    with col_download2:
+        # Botão para baixar todos os dados
+        if st.button('Planilha CSV com todos os cursos do Brasil', type="secondary"):
+            csv = convert_df_to_csv(data_graduacao)
+            st.download_button(label="Dados prontos para download. Clique aqui para baixar.", 
+                            data=csv, 
+                            file_name='Todos_os_dados_graduacao.csv', 
+                            mime='text/csv')
+    
+
+
+
+
+
+def main():
+    st.title('Guia das Federais')
+    st.subheader('Encontre cursos de graduação, mestrado e doutorado das universidades públicas do Brasil num único lugar')
+    st.markdown(""" Este site é uma iniciativa voluntária para facilitar o acesso a informações sobre cursos de graduação, mestrado e doutorado em universidades públicas brasileiras - federais, estaduais e municipais permitindo visualizar todas as opções disponíveis em um único lugar, sem a necessidade de buscas extensas e trabalhosas. As informações aqui disponibilizadas foram extraídas de fontes oficiais do governo, como o e-MEC e a Plataforma Sucupira. 
+    """)
+
+    # Criação de abas para Graduação e Pós-Graduação
+    tab1, tab2 = st.tabs(["Encontrar cursos de Graduação","Encontrar cursos de Mestrado e Doutorado"])
+
+    with tab1:
+        show_graduacao()
+    with tab2:
+        show_pos_graduacao()
+
+
     st.markdown(""" ---
     ### O que eu faço agora? 🌟🚀
 
@@ -212,8 +366,8 @@ def main():
     Não se preocupe, eu te guio nessa! 🌈✨
 
     1. **Google é seu novo BFF!** 🌐👯
-    - Infelizmente, a CAPES, apesar de ser super legal fornecendo dados, não nos deu links diretos. 😞
-    - Mas hey, isso não é um beco sem saída! Use o poderoso Google para buscar mais sobre os cursos que chamaram sua atenção. Digite o nome da universidade e do curso e... Voilà! Informações fresquinhas ao seu dispor.
+    - Infelizmente, o MEC, apesar de ter disponibilizado os dados, não nos deu links diretos. 😞
+    - Mas isso não é um beco sem saída! Use o poderoso Google para buscar mais sobre os cursos que chamaram sua atenção. Digite o nome da universidade e do curso e... Voilà! Informações fresquinhas ao seu dispor.
 
     2. **Amantes de Planilhas, Uni-vos!** 📊💻
     - Se você curte uma boa planilha (quem não, né?), temos um presentão! 🎁
@@ -231,15 +385,12 @@ def main():
     # Disclaimer/Avisos legais
     st.markdown(""" ---
     #### Disclaimer
-    Este site é uma iniciativa voluntária para facilitar o acesso a informações sobre cursos de graduação, mestrado e doutorado em universidades públicas brasileiras - federais, estaduais e municipais. Criado para superar a dispersão de informações e a dificuldade de encontrar dados específicos em sites individuais de universidades, ele oferece uma solução centralizada. Aqui, você encontra informações extraídas de fontes oficiais como o e-MEC e a Plataforma Sucupira, disponíveis num formato concentrado e de fácil navegação. Nosso objetivo é simplificar a busca por oportunidades acadêmicas, permitindo que você veja todas as opções disponíveis em um único lugar, sem a necessidade de buscas extensas e trabalhosas. Este site é um recurso desenvolvido com dedicação, visando ajudar estudantes e acadêmicos a explorar as possibilidades educacionais nas universidades públicas do Brasil.
+    Apesar do esforço em disponibilizar informações de qualidade, podem haver erros, por isso utilize essas informações :red[por sua conta e risco]. Não são oferecidas quaisquer garantias.
     """)
 
     # Adicionar o email de contato
     st.markdown('**Desenvolvido por Erick C. Campos:** [erickcampos50@gmail.com](mailto:erickcampos50@gmail.com)')
 
-    # Adicionar a thumbnail da foto
-    url_foto = "http://servicosweb.cnpq.br/wspessoa/servletrecuperafoto?tipo=1&id=K4239728J7"
-    
 
 
 # %%

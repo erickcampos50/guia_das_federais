@@ -1,0 +1,30 @@
+ID	 Código	 Nome	 Tipo	 Formato	 Pergunta
+V55	AN_BASE	Ano de referência do Coleta	discrete	numeric	
+V56	NM_GRANDE_AREA_CONHECIMENTO	Grande área do conhecimento do programa de pós-graduação	discrete	character	
+V57	NM_AREA_CONHECIMENTO	Área de conhecimento do programa de pós-graduação	discrete	character	
+V84	NM_AREA_BASICA	Área básica do conhecimento do programa de pós-graduação	discrete	character	
+V58	NM_SUBAREA_CONHECIMENTO	Subárea do conhecimento do programa de pós-graduação	discrete	character	
+V59	NM_ESPECIALIDADE	Especialidade do conhecimento programa de pós-graduação	discrete	character	
+V60	CD_AREA_AVALIACAO	Código identificador da área de avaliação do programa de pós-graduação	discrete	character	
+V61	NM_AREA_AVALIACAO	Área de avaliação do programa de pós-graduação	discrete	character	
+V85	CD_ENTIDADE_CAPES	Código da Instituição de Ensino Superior na CAPES	discrete	numeric	
+V86	CD_ENTIDADE_EMEC	Código e-Mec da Instituição de Ensino Superior	discrete	numeric	
+V62	SG_ENTIDADE_ENSINO	Sigla da Instituição de Ensino Superior do programa de pós-graduação	discrete	character	
+V63	NM_ENTIDADE_ENSINO	Instituição de Ensino Superior do programa de pós-graduação	discrete	character	
+V78	IN_REDE	Indicador de programa de pós-graduação em rede	discrete	character	
+V79	SG_ENTIDADE_ENSINO_REDE	Siglas das Instituições que compõem o programa em rede, quando for o caso	discrete	character	
+V64	CS_STATUS_JURIDICO	Status Jurídico da Instituição de Ensino Superior	discrete	character	
+V65	DS_DEPENDENCIA_ADMINISTRATIVA	Dependência administrativa da Instituição de Ensino Superior	discrete	character	
+V66	DS_ORGANIZACAO_ACADEMICA	Organização acadêmica da Instituição de Ensino Superior	discrete	character	
+V67	NM_REGIAO	Grande Região onde está localizado o programa	discrete	character	
+V73	SG_UF_PROGRAMA	Sigla da Unidade da Federação do programa	discrete	character	
+V68	NM_MUNICIPIO_PROGRAMA_IES	Município sede do programa de pós-graduação	discrete	character	
+V69	NM_MODALIDADE_PROGRAMA	Modalidade do programa de pós-graduação	discrete	character	
+V70	CD_PROGRAMA_IES	Código do programa de pós-graduação	discrete	character	
+V71	NM_PROGRAMA_IES	Nome do programa de pós-graduação	discrete	character	
+V72	NM_PROGRAMA_IDIOMA	Nome do programa de pós-graduação em inglês	discrete	character	
+V74	NM_GRAU_PROGRAMA	Nível do programa de pós-graduação	discrete	character	
+V75	CD_CONCEITO_PROGRAMA	Nota/Conceito do programa de pós-graduação	discrete	character	
+V76	AN_INICIO_PROGRAMA	Ano de início do programa de pós-graduação	discrete	numeric	
+V77	AN_INICIO_CURSO	Ano de início de cada curso que compõe o programa	discrete	numeric	
+V80	DS_SITUACAO_PROGRAMA	Situação do programa no ano de referência	discrete	character	
