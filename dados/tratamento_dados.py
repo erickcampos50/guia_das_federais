@@ -1,4 +1,6 @@
 # %%
+# Esta seção importa e trata os dados obtidos via Capes https://dadosabertos.capes.gov.br/dataset/2017-a-2020-programas-da-pos-graduacao-stricto-sensu-no-brasil
+# São referentes exclusivamente ao Mestrado e Doutorado
 import pandas as pd
 
 def filtrar_dados_capes_csv(arquivo_dados_pos, arquivo_codigos_pos):
@@ -24,14 +26,14 @@ def filtrar_dados_capes_csv(arquivo_dados_pos, arquivo_codigos_pos):
     except Exception as e:
         return f"Ocorreu um erro: {e}"
 
-#%%
-# Exemplo de como usar a função
+# É necessário ajustar os nomes dos arquivos se novas versões da base de dados forem disponibilizadas
 arquivo_codigos_pos = 'CAPES_originais/codigos_capes.csv'
 arquivo_dados_pos = 'CAPES_originais/br-capes-colsucup-prog-2021-2022-11-30.csv'
 dados_resultantes_pos = filtrar_dados_capes_csv(arquivo_dados_pos, arquivo_codigos_pos)
-#%%
 dados_resultantes_pos.to_csv("../mestrado_doutorado_univ_publicas.csv", index=None, sep='\t')
 #%%
+# Esta seção importa e trata os dados obtidos via MEC https://dadosabertos.mec.gov.br/indicadores-sobre-ensino-superior
+# São referentes exclusivamente à Graduação
 import pandas as pd
 
 def filtrar_dados_mec_csv(arquivo_dados_graduacao, arquivo_codigos_graduacao):
@@ -66,13 +68,71 @@ def filtrar_dados_mec_csv(arquivo_dados_graduacao, arquivo_codigos_graduacao):
     except Exception as e:
         return f"Ocorreu um erro: {e}"
 
-#%%
-# Exemplo de como usar a função
+
 arquivo_codigos_graduacao = 'MEC_originais/dicionario_codigos.csv'
 arquivo_dados_graduacao = 'MEC_originais/PDA_Dados_Cursos_Graduacao_Brasil.csv'
 dados_resultantes_graduacao = filtrar_dados_mec_csv(arquivo_dados_graduacao, arquivo_codigos_graduacao)
-
-#%%
 dados_resultantes_graduacao.to_csv("../graduacao_univ_publicas.csv", index=None, sep='\t')
-
 # %%
+# Esta seção importa e trata os dados obtidos via MEC https://dadosabertos.mec.gov.br/indicadores-sobre-ensino-superior/item/182-cursos-de-especializacao-do-brasil
+# São referentes exclusivamente à Pós-graduação lato senso (a especializacao)
+# Como não exisitia uma informação sobre a Categoria da IES nesta base de dados, foi necessário utilizar o resultado da seção anterior como referência pra conseguir filtrar 
+import pandas as pd
+
+# Script para ler e processar os dados dos CSVs
+
+# Função para ler o arquivo CSV e criar o dataframe "IES_publicas"
+def criar_dataframe_ies_publicas(dados_resultantes_graduacao):
+    # Ler o arquivo CSV
+    df_graduacao = pd.read_csv(dados_resultantes_graduacao,sep='\t')
+
+    # Selecionar valores únicos da coluna "Nome da IES" e os valores correspondentes da coluna "Categoria da IES"
+    df_ies_publicas = df_graduacao.drop_duplicates(subset=["Nome da IES"])[["Nome da IES", "Categoria da IES"]]
+    
+    # Renomear o dataframe
+    df_ies_publicas.rename(columns={"Nome da IES": "NOME_IES", "Categoria da IES": "Categoria_IES"}, inplace=True)
+
+    return df_ies_publicas
+
+# Função para ler o arquivo CSV "PDA_Cursos_Especializacao_Brasil.csv" e filtrar as linhas com correspondência no dataframe "IES_publicas"
+def filtrar_cursos_especializacao(df_ies_publicas,arquivo_dados_especializacao):
+    # Ler o arquivo CSV
+    df_especializacao = pd.read_csv(arquivo_dados_especializacao,sep=',')
+
+    # Filtrar as linhas onde a coluna "Nome da IES" tenha correspondência no dataframe "IES_publicas"
+    df_especializacao_filtrado = df_especializacao[df_especializacao["NOME_IES"].isin(df_ies_publicas["NOME_IES"])]
+
+    # Filtrar os dados conforme as condições
+    df_especializacao_filtrado = df_especializacao_filtrado.loc[(df_especializacao_filtrado['SITUACAO'] == 'Ativo')]
+
+    # Descartar as colunas especificadas
+    colunas_para_descartar = ['CODIGO_IES','CODIGO_ESPECIALIZACAO', 'CODIGO_OCDE_CINE', 'CODIGO_MUNICIPIO']
+    df_especializacao_filtrado = df_especializacao_filtrado.drop(columns=colunas_para_descartar)
+
+    # Como existem muitos dados de duração que são absurdos (como 480 meses) eu estou modificando qualquer coisa acima de 48 meses para 48
+    df_especializacao_filtrado.loc[df_especializacao_filtrado['DURACAO_MESES'] > 48, 'DURACAO_MESES'] = 48
+
+    # Como existem muitos dados de carga horária que não condizem com a realidade, estou definindo como 30hrs/mes para qualquer curso que extrapole um valor razoavel
+    df_especializacao_filtrado.loc[df_especializacao_filtrado['CARGA_HORARIA'] > 720, 'CARGA_HORARIA'] = df_especializacao_filtrado['DURACAO_MESES']*30
+
+
+    df_especializacao_filtrado.rename(columns={"OCDE_CINE": "Area_Conhecimento"}, inplace=True)
+
+    # Junção dos dataframes baseada na coluna "Nome da IES" / "Nome_IES"
+    df_especializacao_filtrado_unificado = df_especializacao_filtrado.merge(df_ies_publicas,left_on="NOME_IES", right_on="NOME_IES",how="left")
+
+
+    return df_especializacao_filtrado_unificado
+#%%
+# Executando as funções
+arquivo_dados_resultantes_graduacao = "../graduacao_univ_publicas.csv"
+df_ies_publicas = criar_dataframe_ies_publicas(arquivo_dados_resultantes_graduacao)
+#%%
+df_ies_publicas.head()
+#%%
+arquivo_dados_especializacao = "MEC_originais/PDA_Cursos_Especializacao_Brasil.csv"
+dados_resultantes_especializacao = filtrar_cursos_especializacao(df_ies_publicas,arquivo_dados_especializacao)
+dados_resultantes_especializacao.to_csv("../especializacao_univ_publicas.csv", index=None, sep='\t')
+# Exibir os dataframes resultantes
+dados_resultantes_especializacao.head()
+

@@ -13,7 +13,7 @@ st.set_page_config(
 # %%
 # Função para carregar os dados do CSV da pos-graduacao
 @st.cache_data  # Cache para melhorar a performance
-def load_data(csv_file):
+def load_data_mestrado_doutorado(csv_file):
     df = pd.read_csv(csv_file,sep='\t',index_col=None)
     
     
@@ -58,37 +58,140 @@ def load_data_graduacao(csv_file):
 
     return df
 
+@st.cache_data  # Cache para melhorar a performance
+def load_data_especializacao(csv_file):
+    df = pd.read_csv(csv_file, sep='\t', index_col=None)
+    return df
+
+
 #%%
 def convert_df_to_csv(df):
     return df.to_csv(index=False).encode('utf-8')
 
 # %%
 # Carregar os dados
-data_pos = load_data('mestrado_doutorado_univ_publicas.csv')
+data_mestrado_doutorado = load_data_mestrado_doutorado('mestrado_doutorado_univ_publicas.csv')
 data_graduacao = load_data_graduacao('graduacao_univ_publicas.csv')
+data_especializacao = load_data_especializacao('especializacao_univ_publicas.csv')
+
 
 
 # %%
-# Interface Pós graduação do Streamlit 
-def show_pos_graduacao():
+def show_especializacao():
+    st.caption("""🔍 **Escolha os filtros que preferir** e veja os resultados na tabela no final da página.    
+    💡 **Dica:** Você pode deixar todos os filtros em branco se quiser ver todos os dados 🌐
+""")
+
+    col_area, col_modalidade = st.columns(2)
+    with col_area:
+        # Primeira camada de filtro: Área de Conhecimento
+        areas_conhecimento = st.multiselect('Área de conhecimento especializacao', 
+                                            sorted(data_especializacao['Area_Conhecimento'].unique()), 
+                                            default=[])
+        df_filtrado = data_especializacao[data_especializacao['Area_Conhecimento'].isin(areas_conhecimento)] if areas_conhecimento else data_especializacao
+    with col_modalidade:
+        # Segunda camada de filtro: Modalidade de Ensino
+        modalidade = st.multiselect('Modalidade de ensino', 
+                                sorted(df_filtrado['MODALIDADE'].unique()), 
+                                default=[])
+        df_filtrado = df_filtrado[df_filtrado['MODALIDADE'].isin(modalidade)] if modalidade else df_filtrado
+
+    col_nome_ies, col_nome_especializacao = st.columns(2)
+    with col_nome_ies:
+        # Terceira camada de filtro: Nome da Instituição
+        nome_ies = st.multiselect('Nome da Instituição', 
+                                sorted(df_filtrado['NOME_IES'].unique()), 
+                                default=[])
+        df_filtrado = df_filtrado[df_filtrado['NOME_IES'].isin(nome_ies)] if nome_ies else df_filtrado
+    with col_nome_especializacao:
+        # Quarta camada de filtro: Nome do Curso de Especialização
+        nome_especializacao = st.multiselect('Nome do Curso de Especialização', 
+                                            sorted(df_filtrado['NOME_ESPECIALIZACAO'].unique()), 
+                                            default=[])
+        df_filtrado = df_filtrado[df_filtrado['NOME_ESPECIALIZACAO'].isin(nome_especializacao)] if nome_especializacao else df_filtrado
+
+    col_carga_horaria, col_duracao = st.columns(2)
     
+    with col_carga_horaria:
+        # Quinta camada de filtro: Carga Horária
+        if not df_filtrado.empty:
+            min_carga_horaria, max_carga_horaria = min(df_filtrado['CARGA_HORARIA']), max(df_filtrado['CARGA_HORARIA'])
+            carga_horaria = st.slider('Carga Horária', 
+                                    min_carga_horaria, max_carga_horaria, 
+                                    (min_carga_horaria, max_carga_horaria), step=30)
+            df_filtrado = df_filtrado[(df_filtrado['CARGA_HORARIA'] >= carga_horaria[0]) & (df_filtrado['CARGA_HORARIA'] <= carga_horaria[1])]
+    with col_duracao:
+        # Sexta camada de filtro: Duração em Meses
+        if not df_filtrado.empty:
+            min_duracao_meses, max_duracao_meses = min(df_filtrado['DURACAO_MESES']), max(df_filtrado['DURACAO_MESES'])
+            duracao_meses = st.slider('Duração em Meses', 
+                                    min_duracao_meses, max_duracao_meses, 
+                                    (min_duracao_meses, max_duracao_meses),step=6)
+            df_filtrado = df_filtrado[(df_filtrado['DURACAO_MESES'] >= duracao_meses[0]) & (df_filtrado['DURACAO_MESES'] <= duracao_meses[1])]
 
-      
-    st.markdown("* **Atenção:** Todos os filtros são opcionais, selecione somente aqueles que desejar e veja os resultados na tabela abaixo. Se nenhum for selecionado, todos os dados estarão disponíveis")
+    col_municipio,col_estado = st.columns(2)
+    with col_municipio:
+        # Sétima camada de filtro: Município
+        municipio_especializacao = st.multiselect('Município', 
+                                sorted(df_filtrado['MUNICIPIO'].unique()), 
+                                default=[])
+        df_filtrado = df_filtrado[df_filtrado['MUNICIPIO'].isin(municipio_especializacao)] if municipio_especializacao else df_filtrado
 
+    with col_estado:
+        # Oitava camada de filtro: Estado (UF)
+        estado_especializacao = st.multiselect('Estado', 
+                            sorted(df_filtrado['UF'].unique()), 
+                            default=[])
+        df_filtrado = df_filtrado[df_filtrado['UF'].isin(estado_especializacao)] if estado_especializacao else df_filtrado
+
+    df_filtrado.reset_index(drop=True, inplace=True)
+
+    st.caption(""" ---
+    __Atenção__: Se a tabela estiver muito pequena, você pode clicar no botão de ampliar no canto superior ou baixar a tabela nos botões abaixo""")
+    # Aqui você pode adicionar a lógica para exibir a tabela com base nas seleções feitas.
+    st.dataframe(df_filtrado[['NOME_ESPECIALIZACAO','NOME_IES','MUNICIPIO','UF','MODALIDADE','DURACAO_MESES','CARGA_HORARIA']])
+
+
+
+    st.markdown(""" ---
+    Utilize os botões abaixo se desejar baixar os dados da tabela acima :red[(primeiro botão)] ou baixar a base de dados orignal com todos os cursos de especialização das universidades públicas do Brasil :blue[(segundo botão)]""")
+    col_download1, col_download2 = st.columns(2)
+    with col_download1:
+        # Botão para baixar dados filtrados
+        if st.button('Planilha CSV dos dados dos cursos de especializacao', type="primary"):
+            csv = convert_df_to_csv(df_filtrado)
+            st.download_button(label="Dados prontos para download. Clique aqui para baixar.", 
+                            data=csv, 
+                            file_name='Dados_filtrados_graduacao.csv', 
+                            mime='text/csv')    
+    with col_download2:
+        # Botão para baixar todos os dados
+        if st.button('Planilha CSV com todas as especializações do Brasil', type="secondary"):
+            csv = convert_df_to_csv(data_especializacao)
+            st.download_button(label="Dados prontos para download. Clique aqui para baixar.", 
+                            data=csv, 
+                            file_name='Todos_os_dados_graduacao.csv', 
+                            mime='text/csv')
+
+# Interface Mestrado e Doutorado
+def show_mestrado_doutorado():
+    
+    st.caption("""🔍 **Escolha os filtros que preferir** e veja os resultados na tabela no final da página.    
+    💡 **Dica:** Você pode deixar todos os filtros em branco se quiser ver todos os dados 🌐
+""")
     col_niveis, col_area = st.columns(2)
     with col_niveis:
         # Seleção múltipla para os níveis de curso
-        niveis = st.multiselect('Tipos de graduação/pós-graduação', 
-                                sorted(data_pos['Nivel_Programa'].unique()), 
+        niveis = st.multiselect('Nível (Mestrado, Doutorado, etc.)', 
+                                sorted(data_mestrado_doutorado['Nivel_Programa'].unique()), 
                                 default=[])
         # Filtrando dados com base na seleção de níveis
-        data_niveis = data_pos if not niveis else data_pos[data_pos['Nivel_Programa'].isin(niveis)]
+        data_niveis = data_mestrado_doutorado if not niveis else data_mestrado_doutorado[data_mestrado_doutorado['Nivel_Programa'].isin(niveis)]
 
     with col_area:
         # Multiselect para Área de Conhecimento
         areas_conhecimento = st.multiselect('Área de conhecimento', 
-                                            sorted(data_pos['Area_Conhecimento'].unique()), 
+                                            sorted(data_mestrado_doutorado['Area_Conhecimento'].unique()), 
                                             default=[])
         st.caption('__Atenção aos servidores públicos:__ Observe se esta informação está alinhada com seu ambiente organizacional')
         # Filtrando dados com base na seleção de áreas de conhecimento
@@ -108,7 +211,7 @@ def show_pos_graduacao():
     col_estado, col_municipio = st.columns(2)
     with col_estado:
         # Multiselect para estados
-        estados = st.multiselect('Estado', 
+        estados = st.multiselect('Estado da instituição', 
                                 sorted(data_atual['UF'].unique()), 
                                 default=[])
         # Filtrando dados com base na seleção de estados
@@ -128,7 +231,7 @@ def show_pos_graduacao():
                                     default=[])
         # Filtrando dados com base na seleção de municípios
         data_municipios = data_estados if not municipios else data_estados[data_estados['Municipio'].isin(municipios)]
-    st.caption('Se você tiver selecionado alguum :blue[estado] somente serão exibidos os municípios pertencentes àquele estado. Se nenhum :blue[estado] estiver marcado, serão exibidos todos os municípios')
+   
 
 
     # Usando 'data_municipios' como base para os próximos filtros
@@ -158,10 +261,12 @@ def show_pos_graduacao():
 
     # Ordenando os dados primeiro por Nome_Programa e depois por Sigla_IES, UF, Município e Modalidade
     filtered_data_sorted = filtered_data.sort_values(by=['Nome_Programa', 'Sigla_IES', 'UF', 'Municipio', 'Modalidade'])
-
-    # Resetando os índices para não exibi-los
     filtered_data_sorted.reset_index(drop=True, inplace=True)
 
+
+    
+    st.caption(""" ---
+    __Atenção__: Se a tabela estiver muito pequena, você pode clicar no botão de ampliar no canto superior ou baixar a tabela nos botões abaixo""")
     # Exibindo a tabela com os resultados filtrados
     st.dataframe(filtered_data_sorted[['Nome_Programa', 'Sigla_IES', 'UF', 
                                     'Municipio', 'Area_Conhecimento', 'Nota_Conceito', 'Nivel_Programa',
@@ -182,7 +287,7 @@ def show_pos_graduacao():
     with col_download2:
         # Botão para baixar todos os dados
         if st.button('Planilha CSV com todos os programas do Brasil', type="secondary"):
-            csv = convert_df_to_csv(data_pos)
+            csv = convert_df_to_csv(data_mestrado_doutorado)
             st.download_button(label="Dados prontos para download. Clique aqui para baixar.", 
                             data=csv, 
                             file_name='Todos_os_dados.csv', 
@@ -194,7 +299,9 @@ def show_pos_graduacao():
 # Função para exibir a mensagem de "Em Construção"
 def show_graduacao():
     
-    st.markdown("* **Atenção:** Todos os filtros são opcionais e você pode escolher vários ao mesmo tempo. Se nenhum for selecionado, todos os dados estarão disponíveis")
+    st.caption("""🔍 **Escolha os filtros que preferir** e veja os resultados na tabela no final da página.    
+    💡 **Dica:** Você pode deixar todos os filtros em branco se quiser ver todos os dados 🌐
+""")
 
     col_graus, col_modalidade = st.columns(2)
     with col_graus:
@@ -206,7 +313,7 @@ def show_graduacao():
         data_graus = data_graduacao if not graus else data_graduacao[data_graduacao['Grau'].isin(graus)]
 
     with col_modalidade:
-        # Multiselect para Área de Conhecimento
+        # Multiselect para Modalidade de ensino
         modalidade_ensino = st.multiselect('Modalidade de Ensino (Presencial ou EAD)', 
                                             sorted(data_graduacao['Modalidade_Ensino'].unique()), 
                                             default=["Educação Presencial"])
@@ -242,7 +349,6 @@ def show_graduacao():
                                     default=[])
         # Filtrando dados com base na seleção de municípios
         data_municipios = data_estados if not municipios else data_estados[data_estados['Municipio'].isin(municipios)]
-    st.caption('Se você tiver selecionado alguum :blue[estado] somente serão exibidos os municípios pertencentes àquele estado. Se nenhum :blue[estado] estiver marcado, serão exibidos todos os municípios')
 
 
     # Usando 'data_municipios' como base para os próximos filtros
@@ -269,10 +375,13 @@ def show_graduacao():
     
     # Ordenando os dados primeiro por Nome_Programa e depois por Sigla_IES, UF, Município e Modalidade
     filtered_data_sorted = data_curso_ies.sort_values(by=['Nome_Curso', 'Nome_IES', 'UF', 'Municipio', 'Modalidade_Ensino'])
-
-    # Resetando os índices para não exibi-los
     filtered_data_sorted.reset_index(drop=True, inplace=True)
 
+
+
+
+    st.caption(""" ---
+    __Atenção__: Se a tabela estiver muito pequena, você pode clicar no botão de ampliar no canto superior ou baixar a tabela nos botões abaixo""")
     # Exibindo a tabela com os resultados filtrados
     st.dataframe(filtered_data_sorted[['Nome_Curso', 'Nome_IES', 'UF', 
                                     'Municipio', 'Modalidade_Ensino','Grau','Area_Conhecimento' ]])
@@ -305,18 +414,18 @@ def show_graduacao():
 
 def main():
     st.title('Guia das Federais')
-    st.subheader('Encontre cursos de graduação, mestrado e doutorado das universidades públicas do Brasil num único lugar')
-    st.markdown(""" Este site é uma iniciativa voluntária para facilitar o acesso a informações sobre cursos de graduação, mestrado e doutorado em universidades públicas brasileiras - federais, estaduais e municipais permitindo visualizar todas as opções disponíveis em um único lugar, sem a necessidade de buscas extensas e trabalhosas. As informações aqui disponibilizadas foram extraídas de fontes oficiais do governo, como o e-MEC e a Plataforma Sucupira. 
-    """)
+    st.subheader('Encontre cursos de graduação, especialização, mestrado e doutorado das universidades públicas do Brasil num único lugar')
 
     # Criação de abas para Graduação e Pós-Graduação
-    tab1, tab2 = st.tabs(["Encontrar cursos de Graduação","Encontrar cursos de Mestrado e Doutorado"])
+    tab1, tab2, tab3 = st.tabs(["CURSOS DE GRADUAÇÃO","ESPECIALIZAÇÃO","MESTRADO E DOUTORADO"])
 
     with tab1:
         show_graduacao()
     with tab2:
-        show_pos_graduacao()
-
+        show_especializacao()
+    with tab3:
+        show_mestrado_doutorado()
+    
 
     st.markdown(""" ---
     ### O que eu faço agora? 🌟🚀
@@ -346,7 +455,10 @@ def main():
     st.markdown(""" ---
     #### Disclaimer
     Apesar do esforço em disponibilizar informações de qualidade, podem haver erros, por isso utilize essas informações :red[por sua conta e risco]. Não são oferecidas quaisquer garantias.
+
+    Este site é uma iniciativa voluntária para facilitar o acesso a informações sobre cursos de graduação, mestrado e doutorado em universidades públicas brasileiras - federais, estaduais e municipais permitindo visualizar todas as opções disponíveis em um único lugar, sem a necessidade de buscas extensas e trabalhosas. As informações aqui disponibilizadas foram extraídas de fontes oficiais do governo, como o e-MEC e a Plataforma Sucupira.
     """)
+
 
     # Adicionar o email de contato
     st.markdown('**Desenvolvido por Erick C. Campos:** [erickcampos50@gmail.com](mailto:erickcampos50@gmail.com)')
