@@ -113,21 +113,28 @@ def show_especializacao():
     col_carga_horaria, col_duracao = st.columns(2)
     
     with col_carga_horaria:
-        # Quinta camada de filtro: Carga Horária
+    # Quinta camada de filtro: Carga Horária
         if not df_filtrado.empty:
             min_carga_horaria, max_carga_horaria = min(df_filtrado['CARGA_HORARIA']), max(df_filtrado['CARGA_HORARIA'])
-            carga_horaria = st.slider('Carga Horária', 
-                                    min_carga_horaria, max_carga_horaria, 
-                                    (min_carga_horaria, max_carga_horaria), step=30)
-            df_filtrado = df_filtrado[(df_filtrado['CARGA_HORARIA'] >= carga_horaria[0]) & (df_filtrado['CARGA_HORARIA'] <= carga_horaria[1])]
+            if min_carga_horaria < max_carga_horaria:  # Só mostra o slider se houver um intervalo válido
+                carga_horaria = st.slider('Carga Horária', 
+                                        min_carga_horaria, max_carga_horaria, 
+                                        (min_carga_horaria, max_carga_horaria), step=30)
+                df_filtrado = df_filtrado[(df_filtrado['CARGA_HORARIA'] >= carga_horaria[0]) & (df_filtrado['CARGA_HORARIA'] <= carga_horaria[1])]
+            else:
+                st.warning("Não é possível ajustar a Carga Horária, pois todos os cursos filtrados têm a mesma Carga Horária.")
+
     with col_duracao:
-        # Sexta camada de filtro: Duração em Meses
+    # Sexta camada de filtro: Duração em Meses
         if not df_filtrado.empty:
             min_duracao_meses, max_duracao_meses = min(df_filtrado['DURACAO_MESES']), max(df_filtrado['DURACAO_MESES'])
-            duracao_meses = st.slider('Duração em Meses', 
-                                    min_duracao_meses, max_duracao_meses, 
-                                    (min_duracao_meses, max_duracao_meses),step=6)
-            df_filtrado = df_filtrado[(df_filtrado['DURACAO_MESES'] >= duracao_meses[0]) & (df_filtrado['DURACAO_MESES'] <= duracao_meses[1])]
+            if min_duracao_meses < max_duracao_meses:  # Só mostra o slider se houver um intervalo válido
+                duracao_meses = st.slider('Duração em Meses', 
+                                        min_duracao_meses, max_duracao_meses, 
+                                        (min_duracao_meses, max_duracao_meses), step=6)
+                df_filtrado = df_filtrado[(df_filtrado['DURACAO_MESES'] >= duracao_meses[0]) & (df_filtrado['DURACAO_MESES'] <= duracao_meses[1])]
+            else:
+                st.warning("Não é possível ajustar a Duração em Meses, pois todos os cursos filtrados têm a mesma Duração.")
 
     col_municipio,col_estado = st.columns(2)
     with col_municipio:
