@@ -122,7 +122,7 @@ def show_especializacao():
                                         (min_carga_horaria, max_carga_horaria), step=30)
                 df_filtrado = df_filtrado[(df_filtrado['CARGA_HORARIA'] >= carga_horaria[0]) & (df_filtrado['CARGA_HORARIA'] <= carga_horaria[1])]
             else:
-                st.warning("Não é possível ajustar a Carga Horária, pois todos os cursos filtrados têm a mesma Carga Horária.")
+                st.warning("Ocultamos o filtro de Carga Horária nesse momento.")
 
     with col_duracao:
     # Sexta camada de filtro: Duração em Meses
@@ -134,7 +134,7 @@ def show_especializacao():
                                         (min_duracao_meses, max_duracao_meses), step=6)
                 df_filtrado = df_filtrado[(df_filtrado['DURACAO_MESES'] >= duracao_meses[0]) & (df_filtrado['DURACAO_MESES'] <= duracao_meses[1])]
             else:
-                st.warning("Não é possível ajustar a Duração em Meses, pois todos os cursos filtrados têm a mesma Duração.")
+                st.warning("Ocultamos o filtro Duração em meses nesse momento.")
 
     col_municipio,col_estado = st.columns(2)
     with col_municipio:
@@ -463,7 +463,7 @@ def main():
     #### Disclaimer
     Apesar do esforço em disponibilizar informações de qualidade, podem haver erros, por isso utilize essas informações :red[por sua conta e risco]. Não são oferecidas quaisquer garantias.
 
-    Este site é uma iniciativa voluntária para facilitar o acesso a informações sobre cursos de graduação, mestrado e doutorado em universidades públicas brasileiras - federais, estaduais e municipais permitindo visualizar todas as opções disponíveis em um único lugar, sem a necessidade de buscas extensas e trabalhosas. As informações aqui disponibilizadas foram extraídas de fontes oficiais do governo, como o e-MEC e a Plataforma Sucupira.
+    Este site é uma iniciativa voluntária para facilitar o acesso a informações sobre cursos de graduação, especialização, mestrado e doutorado em universidades públicas brasileiras - federais, estaduais e municipais permitindo visualizar todas as opções disponíveis em um único lugar, sem a necessidade de buscas extensas e trabalhosas. As informações aqui disponibilizadas foram extraídas de fontes oficiais do governo, como o e-MEC e a Plataforma Sucupira.
     """)
 
 
