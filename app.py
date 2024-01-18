@@ -269,7 +269,7 @@ def show_mestrado_doutorado():
     filtered_data_sorted = filtered_data.sort_values(by=['Nome_Programa', 'Sigla_IES', 'UF', 'Municipio', 'Modalidade'])
         
     st.caption(""" ---
-    __Atenção__: Se a tabela estiver muito pequena, você pode clicar no botão de ampliar no canto superior ou baixar a tabela nos botões abaixo""")
+    __Atenção__: Você pode acessar mais informações sobre o programa como email, site, telefone na coluna 'Mais informações'. Você será direcionado diretamente à plataforma Sucupira""")
     # Exibindo a tabela com os resultados filtrados
     # Configurando a coluna 'Link' para exibir o texto "Mais informações" e redirecionar para o URL correspondente
     link_column_config = st.column_config.LinkColumn(label="Mais informações",display_text="LINK")
