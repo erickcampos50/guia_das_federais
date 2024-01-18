@@ -5,21 +5,27 @@ import pandas as pd
 
 def filtrar_dados_capes_csv(arquivo_dados_pos, arquivo_codigos_pos):
     try:
-        # Carregar o arquivo B.csv que contém o glossário/dicionário
+        # Carregar o arquivo que contém o glossário/dicionário das colunas
         glossario = pd.read_csv(arquivo_codigos_pos, header=None, sep='\t', usecols=[1, 2])
         glossario_dict = dict(zip(glossario[1], glossario[2]))
 
-        # Carregar o arquivo A.csv com os parâmetros específicos: separador de tabulação, sem índice e sem cabeçalho
+        # Carregar o arquivo com os dados dos programas (separador de tabulação, sem índice e sem cabeçalho)
         dados_pos = pd.read_csv(arquivo_dados_pos, sep='\t', index_col=False)
 
-        # Filtrar os dados
+        # Filtrar os dados para selecionar somente os programas em funcionamento, de instituições públicas ou em rede (na maioria das vezes os programas em rede tem participação das IES públicas)
         dados_filtrados = dados_pos.loc[(dados_pos['DS_SITUACAO_PROGRAMA'] == 'EM FUNCIONAMENTO') & 
                                ((dados_pos['DS_DEPENDENCIA_ADMINISTRATIVA'] == 'PÚBLICA') | 
                                 (dados_pos['SG_ENTIDADE_ENSINO_REDE'] == 'SIM')),
-                               dados_pos.columns[:-3]]
+                               dados_pos.columns[:-3]] #Dispensando as ultimas colunas porque não tem informação útil
 
-        # Substituir os cabeçalhos das colunas do arquivo A.csv pelos valores correspondentes do arquivo B.csv
+        # Substituir os cabeçalhos das colunas pelo conteúdo do glossário
         dados_filtrados.columns = [glossario_dict.get(col, col) for col in dados_filtrados.columns]
+
+        # Adicionar a coluna "Link" com o link completo para acessar os detalhes do programa diretamente na plataforma sucupira
+        dados_filtrados['Link'] = dados_filtrados['Código do programa de pós-graduação'].apply(
+            lambda x: "https://sucupira.capes.gov.br/sucupira/public/consultas/coleta/programa/viewPrograma.jsf?cd_programa=" + str(x)
+        )
+
 
         return dados_filtrados
 

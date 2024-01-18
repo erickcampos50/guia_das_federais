@@ -151,12 +151,11 @@ def show_especializacao():
                             default=[])
         df_filtrado = df_filtrado[df_filtrado['UF'].isin(estado_especializacao)] if estado_especializacao else df_filtrado
 
-    df_filtrado.reset_index(drop=True, inplace=True)
-
+    
     st.caption(""" ---
     __Atenção__: Se a tabela estiver muito pequena, você pode clicar no botão de ampliar no canto superior ou baixar a tabela nos botões abaixo""")
     # Aqui você pode adicionar a lógica para exibir a tabela com base nas seleções feitas.
-    st.dataframe(df_filtrado[['NOME_ESPECIALIZACAO','NOME_IES','MUNICIPIO','UF','MODALIDADE','DURACAO_MESES','CARGA_HORARIA']])
+    st.dataframe(df_filtrado[['NOME_ESPECIALIZACAO','NOME_IES','MUNICIPIO','UF','MODALIDADE','DURACAO_MESES','CARGA_HORARIA']],hide_index=True)
 
 
 
@@ -268,16 +267,16 @@ def show_mestrado_doutorado():
 
     # Ordenando os dados primeiro por Nome_Programa e depois por Sigla_IES, UF, Município e Modalidade
     filtered_data_sorted = filtered_data.sort_values(by=['Nome_Programa', 'Sigla_IES', 'UF', 'Municipio', 'Modalidade'])
-    filtered_data_sorted.reset_index(drop=True, inplace=True)
-
-
-    
+        
     st.caption(""" ---
     __Atenção__: Se a tabela estiver muito pequena, você pode clicar no botão de ampliar no canto superior ou baixar a tabela nos botões abaixo""")
     # Exibindo a tabela com os resultados filtrados
+    # Configurando a coluna 'Link' para exibir o texto "Mais informações" e redirecionar para o URL correspondente
+    link_column_config = st.column_config.LinkColumn(label="Mais informações",display_text="LINK")
     st.dataframe(filtered_data_sorted[['Nome_Programa', 'Sigla_IES', 'UF', 
-                                    'Municipio', 'Area_Conhecimento', 'Nota_Conceito', 'Nivel_Programa',
-                                    'Modalidade']])
+                                      'Municipio', 'Area_Conhecimento', 'Nota_Conceito', 'Nivel_Programa',
+                                      'Modalidade', 'Link']],
+                 column_config={"Link": link_column_config},hide_index=True)
     
 
     st.markdown(""" ---
@@ -382,16 +381,12 @@ def show_graduacao():
     
     # Ordenando os dados primeiro por Nome_Programa e depois por Sigla_IES, UF, Município e Modalidade
     filtered_data_sorted = data_curso_ies.sort_values(by=['Nome_Curso', 'Nome_IES', 'UF', 'Municipio', 'Modalidade_Ensino'])
-    filtered_data_sorted.reset_index(drop=True, inplace=True)
-
-
-
-
+    
     st.caption(""" ---
     __Atenção__: Se a tabela estiver muito pequena, você pode clicar no botão de ampliar no canto superior ou baixar a tabela nos botões abaixo""")
     # Exibindo a tabela com os resultados filtrados
     st.dataframe(filtered_data_sorted[['Nome_Curso', 'Nome_IES', 'UF', 
-                                    'Municipio', 'Modalidade_Ensino','Grau','Area_Conhecimento' ]])
+                                    'Municipio', 'Modalidade_Ensino','Grau','Area_Conhecimento' ]],hide_index=True)
     
 
     st.markdown(""" ---
