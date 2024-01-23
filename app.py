@@ -193,7 +193,8 @@ def show_mestrado_doutorado():
                                 default=[])
         # Filtrando dados com base na seleção de níveis
         data_niveis = data_mestrado_doutorado if not niveis else data_mestrado_doutorado[data_mestrado_doutorado['Nivel_Programa'].isin(niveis)]
-
+        st.caption("""💡 **Dica:** A melhor opção para iniciar sua busca é deixar esse filtro em branco para ver todas as opções de mestrado e doutorado
+""")
     with col_area:
         # Multiselect para Área de Conhecimento
         areas_conhecimento = st.multiselect('Área de conhecimento', 
