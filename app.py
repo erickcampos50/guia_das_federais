@@ -181,20 +181,19 @@ def show_especializacao():
 
 # Interface Mestrado e Doutorado
 def show_mestrado_doutorado():
-    
     st.caption("""🔍 **Escolha os filtros que preferir** e veja os resultados na tabela no final da página.    
     💡 **Dica:** Você pode deixar todos os filtros em branco se quiser ver todos os dados 🌐
 """)
     col_niveis, col_area = st.columns(2)
     with col_niveis:
-        # Seleção múltipla para os níveis de curso
-        niveis = st.multiselect('Nível (Mestrado, Doutorado, etc.)', 
-                                sorted(data_mestrado_doutorado['Nivel_Programa'].unique()), 
-                                default=[])
+        # Opções fixas para os níveis de curso (Mestrado e Doutorado)
+        niveis_opcoes = ['MESTRADO', 'DOUTORADO']
+        niveis = st.multiselect('Nível (Mestrado, Doutorado)', 
+                                niveis_opcoes, 
+                                default=niveis_opcoes)
         # Filtrando dados com base na seleção de níveis
-        data_niveis = data_mestrado_doutorado if not niveis else data_mestrado_doutorado[data_mestrado_doutorado['Nivel_Programa'].isin(niveis)]
-        st.caption("""💡 **Dica:** A melhor opção para iniciar sua busca é deixar esse filtro em branco para ver todas as opções de mestrado e doutorado
-""")
+        # Usando correspondência parcial para capturar variações como 'MESTRADO EM ...'
+        data_niveis = data_mestrado_doutorado if not niveis else data_mestrado_doutorado[data_mestrado_doutorado['Nivel_Programa'].str.contains('|'.join(niveis), case=False)]
     with col_area:
         # Multiselect para Área de Conhecimento
         areas_conhecimento = st.multiselect('Área de conhecimento', 
