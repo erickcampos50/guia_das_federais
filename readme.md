@@ -80,3 +80,28 @@ Esse cuidado na seleção dos dados é fundamental para manter a relevância e a
 ## Disclaimer
 
 Este projeto é uma iniciativa independente, e apesar dos esforços para garantir a precisão das informações, pode haver erros. Recomenda-se usar os dados por sua conta e risco, sem garantias.
+
+## Versão JavaScript para GitHub Pages
+
+Para hospedar o Guia das Federais como site estático (sem backend), foi criada uma versão em JavaScript na pasta `webapp`. Ela usa um banco SQLite embarcado com `sql.js` (WebAssembly), renderiza as tabelas com `gridjs` e faz cache do banco em IndexedDB via `localforage`. Assim, depois do primeiro carregamento o usuário não precisa baixar tudo novamente.
+
+- Página de entrada: `webapp/index.html` (apontar o GitHub Pages para essa pasta ou mover os arquivos para a branch de publicação).
+- Banco de dados: `webapp/public/data/guia.sqlite` (já versionado; ~10 MB).
+- Bibliotecas via CDN: `sql.js`, `gridjs`, `bootstrap` e `localforage`.
+
+### Atualizar a base SQLite
+
+1. Deixe os CSVs tratados atualizados na raiz.
+2. Gere o banco consolidado:
+   ```bash
+   python3 build_sqlite_db.py
+   ```
+   Isso recria `webapp/public/data/guia.sqlite` com índices para filtros rápidos.
+3. Publique a pasta `webapp` no GitHub Pages (ou sirva localmente com qualquer servidor estático).
+
+### Usando o site estático
+
+1. Abra `webapp/index.html`.
+2. Escolha a aba (Graduação, Especialização ou Mestrado/Doutorado) e aplique os filtros.
+3. Exporte os resultados em CSV quando quiser.
+4. O SQLite é baixado uma vez e guardado em cache local automaticamente.
