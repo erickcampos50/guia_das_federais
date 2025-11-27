@@ -25,7 +25,9 @@ const datasets = {
       { type: "multi", id: "grad-municipio", column: "municipio" },
       { type: "multi", id: "grad-area", column: "area_conhecimento" },
       { type: "multi", id: "grad-ies", column: "nome_ies" },
-      { type: "text", id: "grad-curso", column: "nome_curso" },
+      // em datasets.graduacao.filters
+      { type: "multi", id: "grad-curso", column: "nome_curso", operator: "like" },
+
     ],
     defaults: {
       "grad-grau": ["Bacharelado", "Licenciatura"],
@@ -53,7 +55,7 @@ const datasets = {
       { type: "multi", id: "esp-uf", column: "uf" },
       { type: "multi", id: "esp-municipio", column: "municipio" },
       { type: "multi", id: "esp-ies", column: "nome_ies" },
-      { type: "text", id: "esp-curso", column: "nome_especializacao" },
+      { type: "multi", id: "esp-curso", column: "nome_especializacao", operator: "like" },
       { type: "range", minId: "esp-carga-min", maxId: "esp-carga-max", column: "carga_horaria" },
       { type: "range", minId: "esp-duracao-min", maxId: "esp-duracao-max", column: "duracao_meses" },
     ],
