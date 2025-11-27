@@ -51,25 +51,26 @@
           <details class="hero__details">
             <summary>Limitações e dicas rápidas</summary>
             <ul class="hero__list">
-              <li>Projeto colaborativo sem garantias: valide datas, vagas e pré-requisitos na instituição.</li>
               <li>Buscas são exatas pelo texto exibido; tente variações de nome se não achar o curso.</li>
-              <li>Primeiro acesso baixa a base compactada; depois, tudo roda mais rápido no seu navegador.</li>
-              <li>Use “Baixar CSV” para levar sua seleção e comparar opções em planilhas.</li>
+              <!-- <li>Primeiro acesso baixa a base compactada; depois, tudo roda mais rápido no seu navegador.</li> -->
+              <li>Use “Baixar CSV” para baixar a sua seleção em formato planilha.</li>
+              <li>Projeto voluntário sem garantias: valide datas, vagas e pré-requisitos na instituição.</li>
+              <div id="status" class="small text-muted hero__status">Carregando...</div>
             </ul>
           </details>
-          <div id="status" class="small text-muted hero__status">Carregando...</div>
+          
         </div>
         <div class="hero__visual">
           <div class="hero__blob"></div>
           <div class="hero__card">
-            <p class="label">Consulta instantânea</p>
+            <p class="label">Consulte</p>
             <p class="value">+5.000 cursos</p>
-            <p class="hint">universidades federais e estaduais</p>
+            <p class="hint">de universidades federais e estaduais</p>
           </div>
           <div class="hero__card hero__card--alt">
-            <p class="label">Tabs</p>
-            <p class="value">3</p>
-            <p class="hint">Grad • Esp • Pós</p>
+            <!-- <p class="label">Tabs</p> -->
+            <!-- <p class="value">3</p> -->
+            <p class="label">Graduação Especialização Mestrado/Doutorado</p>
           </div>
         </div>
       </header>
@@ -78,16 +79,19 @@
         <button class="btn btn-outline-primary active w-100 w-md-auto" data-tab="graduacao" type="button">Graduação</button>
         <button class="btn btn-outline-primary w-100 w-md-auto" data-tab="especializacao" type="button">Especialização</button>
         <button class="btn btn-outline-primary w-100 w-md-auto" data-tab="pos" type="button">Mestrado e Doutorado</button>
+      
       </nav>
-
+      
       <section class="tab-panel" data-panel="graduacao">
         <div class="card mb-3">
-          <div class="card-body">
+        <div class="card-body">
+        <details class="filters-accordion">
+          <summary>Veja opções para filtrar dados</summary>
             <div class="row g-3">
               <div class="col-md-3">
                 <label class="form-label">Grau</label>
                 <div class="multi-box" id="grad-grau" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar grau">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar grau">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -95,7 +99,7 @@
               <div class="col-md-3">
                 <label class="form-label">Modalidade</label>
                 <div class="multi-box" id="grad-modalidade" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar modalidade">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar modalidade">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -103,7 +107,7 @@
               <div class="col-md-3">
                 <label class="form-label">UF</label>
                 <div class="multi-box" id="grad-uf" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar UF">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar por estado">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -111,7 +115,7 @@
               <div class="col-md-3">
                 <label class="form-label">Município</label>
                 <div class="multi-box" id="grad-municipio" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar município">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar município">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -119,7 +123,7 @@
               <div class="col-md-3">
                 <label class="form-label">Área de conhecimento</label>
                 <div class="multi-box" id="grad-area" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar área">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtre pela área do curso">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -127,41 +131,52 @@
               <div class="col-md-3">
                 <label class="form-label">Instituição</label>
                 <div class="multi-box" id="grad-ies" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar instituição">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar instituição">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
               </div>
               <div class="col-md-3">
-                <label class="form-label">Curso (contém)</label>
+                <label class="form-label">Nome do curso</label>
                 <input id="grad-curso" type="text" class="form-control" placeholder="Ex.: Medicina">
               </div>
             </div>
             <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 mt-3">
               <button class="btn btn-primary w-100 w-md-auto" id="grad-filtrar">Aplicar filtros</button>
               <button class="btn btn-outline-secondary w-100 w-md-auto" id="grad-limpar">Limpar filtros</button>
-              <button class="btn btn-outline-success w-100 w-md-auto ms-md-auto" id="grad-download">Baixar CSV</button>
+              <button class="btn btn-outline-success w-100 w-md-auto ms-md-auto" id="grad-download">Baixar planilha CSV</button>
             </div>
             <div class="column-toggle mt-3" data-col-toggle="graduacao">
               <div class="column-toggle__header">
                 <span class="label">Colunas visíveis</span>
-                <span class="hint text-muted small">Marque para exibir na tabela</span>
+                <span class="hint text-muted small">Marque para exibir a coluna na tabela</span>
               </div>
               <div class="toggle-options"></div>
             </div>
           </div>
         </div>
+        <div class="card mb-3">
+        <div class="card-body d-flex align-items-center gap-2">
+          <div>
+            <p class="small text-muted mb-0">
+            Veja aqui os cursos que batem com seus filtros. Clique no cabeçalho para ordenar ou ative mais colunas se precisar.
+            </p>
+          </div>
+        </div>
+      </div>
         <div id="grid-graduacao"></div>
       </section>
 
       <section class="tab-panel d-none" data-panel="especializacao">
         <div class="card mb-3">
           <div class="card-body">
+            <details class="filters-accordion">
+            <summary>Veja opções para filtrar dados</summary>
             <div class="row g-3">
               <div class="col-md-3">
                 <label class="form-label">Área de conhecimento</label>
                 <div class="multi-box" id="esp-area" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar área">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar área do curso">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -169,7 +184,7 @@
               <div class="col-md-3">
                 <label class="form-label">Modalidade</label>
                 <div class="multi-box" id="esp-modalidade" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar modalidade">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar modalidade">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -177,7 +192,7 @@
               <div class="col-md-3">
                 <label class="form-label">UF</label>
                 <div class="multi-box" id="esp-uf" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar UF">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar por estado">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -185,7 +200,7 @@
               <div class="col-md-3">
                 <label class="form-label">Município</label>
                 <div class="multi-box" id="esp-municipio" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar município">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar município">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -193,7 +208,7 @@
               <div class="col-md-3">
                 <label class="form-label">Instituição</label>
                 <div class="multi-box" id="esp-ies" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar instituição">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar instituição">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -233,17 +248,28 @@
             </div>
           </div>
         </div>
+                <div class="card mb-3">
+        <div class="card-body d-flex align-items-center gap-2">
+          <div>
+            <p class="small text-muted mb-0">
+            Veja aqui os cursos que batem com seus filtros. Clique no cabeçalho para ordenar ou ative mais colunas se precisar.
+            </p>
+          </div>
+        </div>
+      </div>
         <div id="grid-especializacao"></div>
       </section>
 
       <section class="tab-panel d-none" data-panel="pos">
         <div class="card mb-3">
           <div class="card-body">
+             <details class="filters-accordion">
+          <summary>Veja opções para filtrar dados</summary>
             <div class="row g-3">
               <div class="col-md-3">
                 <label class="form-label">Nível</label>
                 <div class="multi-box" id="pos-nivel" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar nível">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar nível cadastrado na CAPES">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -251,7 +277,7 @@
               <div class="col-md-3">
                 <label class="form-label">Área de conhecimento</label>
                 <div class="multi-box" id="pos-area" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar área">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar área">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -259,7 +285,7 @@
               <div class="col-md-3">
                 <label class="form-label">Nota CAPES</label>
                 <div class="multi-box" id="pos-nota" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar nota">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar nota">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -267,7 +293,7 @@
               <div class="col-md-3">
                 <label class="form-label">Modalidade</label>
                 <div class="multi-box" id="pos-modalidade" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar modalidade">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar modalidade">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -275,7 +301,7 @@
               <div class="col-md-3">
                 <label class="form-label">UF</label>
                 <div class="multi-box" id="pos-uf" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar UF">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar por estado">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -283,7 +309,7 @@
               <div class="col-md-3">
                 <label class="form-label">Município</label>
                 <div class="multi-box" id="pos-municipio" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar município">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar município">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -291,7 +317,7 @@
               <div class="col-md-3">
                 <label class="form-label">Sigla da IES</label>
                 <div class="multi-box" id="pos-sigla" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar sigla">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar sigla">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -299,7 +325,7 @@
               <div class="col-md-3">
                 <label class="form-label">Nome da IES</label>
                 <div class="multi-box" id="pos-ies" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Buscar instituição">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar instituição">
                   <div class="multi-status small text-muted"></div>
                   <div class="multi-options"></div>
                 </div>
@@ -319,6 +345,15 @@
             </div>
           </div>
         </div>
+                <div class="card mb-3">
+        <div class="card-body d-flex align-items-center gap-2">
+          <div>
+            <p class="small text-muted mb-0">
+            Veja aqui os cursos que batem com seus filtros. Clique no cabeçalho para ordenar ou ative mais colunas se precisar.
+            </p>
+          </div>
+        </div>
+      </div>
         <div id="grid-pos"></div>
       </section>
     </div>

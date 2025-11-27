@@ -11,11 +11,11 @@ const datasets = {
     columns: [
       { id: "nome_curso", name: "Curso" },
       { id: "nome_ies", name: "Instituição" },
+      { id: "municipio", name: "Município" },
+      { id: "uf", name: "UF" },
       { id: "grau", name: "Grau" },
       { id: "modalidade", name: "Modalidade" },
       { id: "area_conhecimento", name: "Área" },
-      { id: "municipio", name: "Município" },
-      { id: "uf", name: "UF" },
       { id: "vagas_autorizadas", name: "Vagas autorizadas" },
     ],
     filters: [
@@ -40,11 +40,11 @@ const datasets = {
     columns: [
       { id: "nome_especializacao", name: "Curso" },
       { id: "nome_ies", name: "Instituição" },
+      { id: "municipio", name: "Município" },
+      { id: "uf", name: "UF" },
       { id: "modalidade", name: "Modalidade" },
       { id: "carga_horaria", name: "Carga horária" },
       { id: "duracao_meses", name: "Duração (meses)" },
-      { id: "municipio", name: "Município" },
-      { id: "uf", name: "UF" },
       { id: "area_conhecimento", name: "Área" },
     ],
     filters: [
@@ -66,11 +66,11 @@ const datasets = {
     columns: [
       { id: "nome_programa", name: "Programa" },
       { id: "sigla_ies", name: "Sigla IES" },
-      { id: "nome_ies", name: "Instituição" },
       { id: "uf", name: "UF" },
       { id: "municipio", name: "Município" },
       { id: "area_conhecimento", name: "Área de conhecimento" },
       { id: "nota_conceito", name: "Nota" },
+      { id: "nome_ies", name: "Instituição" },
       { id: "nivel_programa", name: "Nível" },
       { id: "modalidade", name: "Modalidade" },
       { id: "link", name: "Mais informações" },
@@ -467,7 +467,7 @@ async function runQuery(key) {
       data: rows,
     })
     .forceRender();
-  setStatus(`Resultado (${datasets[key].label}): ${rows.length} registros exibidos (máx. ${GRID_LIMIT}).`);
+  setStatus(`Resultados ${datasets[key].label}: ${rows.length}.`);
 }
 
 function buildWhere(cfg) {
