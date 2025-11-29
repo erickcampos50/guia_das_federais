@@ -3,11 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Guia das Federais - Encontre cursos de graduação, especialização, mestrado e doutorado das universidades públicas do Brasil num único lugar</title>
+    <title>Guia das Federais – Versão AG Grid</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/modern-normalize/2.0.0/modern-normalize.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.3/styles/ag-grid.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.3/styles/ag-theme-quartz.css">
     <link rel="stylesheet" href="./style.css">
   </head>
   <body>
@@ -15,62 +17,152 @@
       <header class="mb-4 hero">
         <div class="hero__content">
           <p class="eyebrow">Guia das Federais</p>
-          <h1 class="hero__title">Encontre cursos de graduação, especialização, mestrado e doutorado das universidades públicas do Brasil num único lugar</h1>
+          <h1 class="hero__title">Descubra onde seus estudos podem te levar</h1>
           <p class="hero__subtitle">
-            Juntamos em um só lugar dados que costumam ficar espalhados em sites e PDFs para ajudar você a planejar a vida acadêmica com mais clareza.
-            Iniciativa voluntária por isso use como referência, mas confirme sempre nos sites oficiais antes de decidir.
+            Se você está escolhendo a primeira graduação, pensando em mudar de área ou procurando uma pós para crescer na carreira,
+            este guia reúne em um só lugar cursos de universidades públicas de todo o Brasil para ajudar você a enxergar possibilidades e planejar os próximos passos.
           </p>
           <div class="hero__chips">
-            <span class="chip chip--primary">Planeje sem perder tempo</span>
-            <span class="chip chip--secondary">Compare cursos lado a lado</span>
-            <span class="chip chip--accent">Decisões mais seguras</span>
+            <span class="chip chip--primary">Veja o mapa dos cursos públicos</span>
+            <span class="chip chip--secondary">Filtre por cidade, área e formato</span>
+            <span class="chip chip--accent">Monte sua lista para decidir com calma</span>
           </div>
           <div class="hero__steps">
             <div class="step">
               <span class="step__icon">1</span>
               <div>
-                <p class="step__title">Escolha a aba</p>
-                <p class="step__text">Graduação, Especialização ou Mestrado/Doutorado.</p>
+                <p class="step__title">Escolha a etapa da jornada</p>
+                <p class="step__text">Graduação para começar, Especialização para aprofundar ou Pós‑Graduação para seguir na pesquisa acadêmica.</p>
               </div>
             </div>
             <div class="step">
               <span class="step__icon">2</span>
               <div>
-                <p class="step__title">Filtre e busque</p>
-                <p class="step__text">Use as listas com busca em tempo real para marcar os critérios.</p>
+                <p class="step__title">Ajuste os filtros ao seu momento</p>
+                <p class="step__text">Combine estado, cidade, área e instituição para encontrar cursos que cabem na sua realidade e nos seus sonhos.</p>
               </div>
             </div>
             <div class="step">
               <span class="step__icon">3</span>
               <div>
-                <p class="step__title">Veja a tabela</p>
-                <p class="step__text">Mostra só as 4 colunas principais; ative mais colunas conforme precisar.</p>
+                <p class="step__title">Escolha o que a tabela mostra</p>
+                <p class="step__text">Ative as colunas que importam — vagas, duração, carga horária, nível, nota — e compare cursos lado a lado.</p>
               </div>
             </div>
           </div>
+
           <details class="hero__details">
-            <summary>Limitações e dicas rápidas</summary>
-            <ul class="hero__list">
-              <li>Buscas são exatas pelo texto exibido; tente variações de nome se não achar o curso.</li>
-              <!-- <li>Primeiro acesso baixa a base compactada; depois, tudo roda mais rápido no seu navegador.</li> -->
-              <li>Use “Baixar CSV” para baixar a sua seleção em formato planilha.</li>
-              <li>Projeto voluntário sem garantias: valide datas, vagas e pré-requisitos na instituição.</li>
-              <div id="status" class="small text-muted hero__status">Carregando...</div>
-            </ul>
+            <summary>Saiba como aproveitar este guia</summary>
+            <section class="info-panels">
+              <div class="info-card">
+                <p class="info-card__label">Quantos cursos existem aqui?</p>
+                <p class="info-card__value">Mais de 26 mil registros</p>
+                <p class="info-card__text">
+                  Na aba Graduação você encontra mais de 17 mil cursos de universidades públicas;
+                  em Especialização, são mais de 5 mil opções; e na aba de Pós‑Graduação há quase 4 mil programas de mestrado e doutorado.
+                  É como abrir um mapa dos caminhos possíveis para a sua vida acadêmica.
+                </p>
+              </div>
+              <div class="info-card">
+                <p class="info-card__label">O que cada linha quer te contar</p>
+                <p class="info-card__text">
+                  Pense em cada linha da tabela como a ficha de um curso: ela mostra onde ele fica (estado e cidade),
+                  em qual instituição é oferecido, em que área do conhecimento se encaixa e como funciona na prática
+                  (presencial, a distância, integral, noturno…).
+                </p>
+                <p class="info-card__text">
+                  Na graduação, você enxerga uma noção de vagas autorizadas. Na especialização, aparecem carga horária e duração em meses — ótimo para quem precisa conciliar estudo e trabalho.
+                  Na pós, entram informações como nível (mestrado, doutorado), área, nota de avaliação e um link para você continuar a pesquisa direto na fonte.
+                </p>
+              </div>
+              <div class="info-card">
+                <p class="info-card__label">E o que não aparece na tela</p>
+                <ul class="info-card__list">
+                  <li>Não mostramos notas de corte, valores de mensalidade ou disponibilidade de bolsas.</li>
+                  <li>Não estão aqui os editais completos, prazos de inscrição ou regras detalhadas de seleção.</li>
+                  <li>Não garantimos que um curso continuará existindo no futuro: use este guia para explorar e depois confirme tudo na instituição.</li>
+                </ul>
+              </div>
+            </section>
+
+            <section class="howto">
+              <h2 class="howto__title">Um passo a passo para você seguir</h2>
+              <div class="howto__grid">
+                <div class="howto__item">
+                  <p class="howto__step">1. Comece pela fase da vida</p>
+                  <p class="howto__text">
+                    Escolha a aba que conversa com o seu momento: Graduação para dar o primeiro passo, Especialização para se atualizar ou Pós‑Graduação para seguir carreira acadêmica.
+                  </p>
+                </div>
+                <div class="howto__item">
+                  <p class="howto__step">2. Encontre o lugar certo para você</p>
+                  <p class="howto__text">
+                    Use os filtros de estado e município para descobrir o que existe perto de casa ou em outras regiões onde você se imagina estudando e vivendo.
+                  </p>
+                </div>
+                <div class="howto__item">
+                  <p class="howto__step">3. Filtre pela área e pela instituição</p>
+                  <p class="howto__text">
+                    Brinque com as combinações de área do conhecimento e instituição até montar uma lista curta de cursos que façam sentido para seus interesses e valores.
+                  </p>
+                </div>
+                <div class="howto__item">
+                  <p class="howto__step">4. Ative as colunas que ajudam sua decisão</p>
+                  <p class="howto__text">
+                    Use os botões de colunas para destacar duração, carga horária, vagas, nível ou nota. Assim, a tabela fica clara para comparar cursos lado a lado.
+                  </p>
+                </div>
+                <div class="howto__item">
+                  <p class="howto__step">5. Baixe sua lista e converse com alguém</p>
+                  <p class="howto__text">
+                    Clique em “Baixar CSV” para levar sua lista para uma planilha. Use esse material para conversar com família, professores, orientadores ou amigos que já passaram por essa escolha.
+                  </p>
+                </div>
+              </div>
+            </section>
           </details>
-          
+
+          <details class="hero__details">
+            <summary>Fontes dos dados e arquivos originais</summary>
+            <div class="sources__card">
+              <p class="sources__text">
+                Os dados deste guia vêm de bases públicas consolidadas. Se você gosta de explorar por conta própria, pode baixar os arquivos originais e fazer suas próprias análises.
+              </p>
+              <ul class="sources__list">
+                <li><strong>Graduação</strong>: [adicionar aqui o link para o arquivo ou portal oficial da base de graduação]</li>
+                <li><strong>Especialização</strong>: [adicionar aqui o link para o arquivo ou portal oficial da base de especialização]</li>
+                <li><strong>Mestrado e Doutorado</strong>: [adicionar aqui o link para o arquivo ou portal oficial da base de pós-graduação]</li>
+              </ul>
+            </div>
+          </details>
+
+          <details class="hero__details">
+            <summary>Créditos</summary>
+            <div class="credits__card">
+              <p class="credits__text">
+                Este site é uma iniciativa voluntária para facilitar o acesso a informações sobre cursos de graduação, especialização, mestrado e doutorado em universidades públicas brasileiras federais, estaduais e municipais permitindo visualizar todas as opções disponíveis em um único lugar em vez de abrir dezenas de páginas diferentes, você encontra aqui uma visão organizada. As informações aqui disponibilizadas foram extraídas de fontes oficiais do governo, como o e-MEC e a Plataforma Sucupira.
+              </p>
+                <ul class="credits__list">
+                  <li>Os dados utilizados são provenientes de uma base pública com mais de 26 mil registros de cursos de universidades públicas, incluindo instituições federais e estaduais e ofertas de graduação, especialização, mestrado e doutorado disponíveis na época da coleta.</li>
+                  <li>As informações podem mudar ao longo do tempo e alguns cursos podem não aparecer caso tenham sido criados ou encerrados após a última atualização; utilize este guia como referência inicial e sempre confirme tudo nos canais oficiais das instituições.</li>
+                  <li>As próprias universidades são responsáveis pelos cursos e regras de ingresso; detalhes atualizados devem ser verificados diretamente nos sites oficiais.</li>
+                  <li>Para sugestões ou correções, utilize o repositório do projeto ou envie um email para <a href="mailto:erick.campos@ufjf.br">erick.campos@ufjf.br</a>.</li>
+                </ul>
+
+            <div id="status" class="small text-muted hero__status">Carregando...</div>
+          </details>
         </div>
         <div class="hero__visual">
           <div class="hero__blob"></div>
           <div class="hero__card">
-            <p class="label">Consulte</p>
-            <p class="value">+5.000 cursos</p>
-            <p class="hint">de universidades federais e estaduais</p>
+            <p class="label">CONSULTE</p>
+            <p class="value">+5.000</p>
+            <p class="hint">cursos em universidades estaduais e federais</p>
           </div>
           <div class="hero__card hero__card--alt">
-            <!-- <p class="label">Tabs</p> -->
-            <!-- <p class="value">3</p> -->
-            <p class="label">Graduação Especialização Mestrado/Doutorado</p>
+            <p class="label">ENCONTRE</p>
+            <p class="value">+1000</p>
+            <p class="hint">mestrados e doutorados gratuitos</p>
           </div>
         </div>
       </header>
@@ -79,308 +171,47 @@
         <button class="btn btn-outline-primary active w-100 w-md-auto" data-tab="graduacao" type="button">Graduação</button>
         <button class="btn btn-outline-primary w-100 w-md-auto" data-tab="especializacao" type="button">Especialização</button>
         <button class="btn btn-outline-primary w-100 w-md-auto" data-tab="pos" type="button">Mestrado e Doutorado</button>
-      
       </nav>
-      
-      <section class="tab-panel" data-panel="graduacao">
-        <div class="card mb-3">
-        <div class="card-body">
-        <details class="filters-accordion">
-          <summary>Veja opções para filtrar os cursos e refinar sua busca</summary>
-            <div class="row g-3">
-              <div class="col-md-3">
-                <label class="form-label">Nome do curso</label>
-                <div class="multi-box" id="grad-curso" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Digite o nome e selecione as opções">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
 
+      <div id="tabPanels"></div>
 
-
-
-              <div class="col-md-3">
-                <label class="form-label">UF</label>
-                <div class="multi-box" id="grad-uf" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar por estado">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Município</label>
-                <div class="multi-box" id="grad-municipio" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar município">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Área de conhecimento</label>
-                <div class="multi-box" id="grad-area" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtre pela área do curso">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Instituição</label>
-                <div class="multi-box" id="grad-ies" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar instituição">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
+      <template id="panel-template">
+        <section class="tab-panel d-none">
+          <div class="card mb-3">
+            <div class="card-body">
               
-
-              <div class="col-md-3">
-                <label class="form-label">Grau</label>
-                <div class="multi-box" id="grad-grau" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar grau">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
+              <details class="filters-accordion">
+                <summary></summary>
+                <div class="row g-3" data-filter-fields></div>
+                <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 mt-3 filter-actions">
+                  <button class="btn btn-primary w-100 w-md-auto" data-role="filtrar" type="button">Aplicar filtros</button>
+                  <button class="btn btn-outline-secondary w-100 w-md-auto" data-role="limpar" type="button">Limpar filtros</button>
+                  <!-- <button class="btn btn-outline-success w-100 w-md-auto ms-md-auto" data-role="download" type="button">Baixar planilha CSV</button> -->
                 </div>
+              </details>
+              <div class="column-picker" data-column-picker>
+                <p class="column-picker__title">Quais colunas você quer ver?</p>
+                <div class="column-picker__options" data-column-options></div>
               </div>
-              <div class="col-md-3">
-                <label class="form-label">Modalidade</label>
-                <div class="multi-box" id="grad-modalidade" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar modalidade">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-            </div>
-            <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 mt-3">
-              <button class="btn btn-primary w-100 w-md-auto" id="grad-filtrar">Aplicar filtros</button>
-              <button class="btn btn-outline-secondary w-100 w-md-auto" id="grad-limpar">Limpar filtros</button>
-              <button class="btn btn-outline-success w-100 w-md-auto ms-md-auto" id="grad-download">Baixar planilha CSV</button>
-            </div>
-            <div class="column-toggle mt-3" data-col-toggle="graduacao">
-              <div class="column-toggle__header">
-                <span class="label">Colunas visíveis</span>
-                <span class="hint text-muted small">Marque para exibir a coluna na tabela</span>
-              </div>
-              <div class="toggle-options"></div>
             </div>
           </div>
-        </div>
-        <div class="card mb-3">
-        <div class="card-body d-flex align-items-center gap-2">
-          <div>
-            <p class="small text-muted mb-0">
-            Veja aqui os cursos que batem com seus filtros. Clique no cabeçalho para ordenar ou ative mais colunas se precisar.
-            </p>
+          <div class="grid-card">
+            <div class="grid-card__title" data-grid-title></div>
+            <div class="grid-card__body ag-theme-quartz" data-grid-body></div>
+            <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 mt-3 filter-actions">
+                  <button class="btn btn-outline-success w-100 w-md-auto ms-md-auto" data-role="download" type="button">Baixar resultados numa planilha</button>
+                </div>
+            <!-- <p class="small text-muted px-3 pb-3 grid-card__hint">Dica: use os botões de colunas logo acima para focar no que importa; toque no título das colunas para ordenar e deslize a tabela no celular.</p> -->
           </div>
-        </div>
-      </div>
-        <div id="grid-graduacao"></div>
-      </section>
+        </section>
+      </template>
 
-      <section class="tab-panel d-none" data-panel="especializacao">
-        <div class="card mb-3">
-          <div class="card-body">
-            <details class="filters-accordion">
-            <summary>Veja opções para filtrar dados</summary>
-            <div class="row g-3">
-
-              <div class="col-md-3">
-                <label class="form-label">Nome do curso</label>
-                <div class="multi-box" id="esp-curso" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Digite o nome e selecione as opções">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-
-
-
-              <div class="col-md-3">
-                <label class="form-label">Área de conhecimento</label>
-                <div class="multi-box" id="esp-area" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar área do curso">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Modalidade</label>
-                <div class="multi-box" id="esp-modalidade" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar modalidade">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">UF</label>
-                <div class="multi-box" id="esp-uf" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar por estado">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Município</label>
-                <div class="multi-box" id="esp-municipio" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar município">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Instituição</label>
-                <div class="multi-box" id="esp-ies" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar instituição">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-           
-              <div class="col-md-3">
-                <label class="form-label">Carga horária mínima</label>
-                <input id="esp-carga-min" type="number" class="form-control" min="0" placeholder="180">
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Carga horária máxima</label>
-                <input id="esp-carga-max" type="number" class="form-control" min="0" placeholder="1440">
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Duração mínima (meses)</label>
-                <input id="esp-duracao-min" type="number" class="form-control" min="0" placeholder="3">
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Duração máxima (meses)</label>
-                <input id="esp-duracao-max" type="number" class="form-control" min="0" placeholder="48">
-              </div>
-            </div>
-            <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 mt-3">
-              <button class="btn btn-primary w-100 w-md-auto" id="esp-filtrar">Aplicar filtros</button>
-              <button class="btn btn-outline-secondary w-100 w-md-auto" id="esp-limpar">Limpar filtros</button>
-              <button class="btn btn-outline-success w-100 w-md-auto ms-md-auto" id="esp-download">Baixar CSV</button>
-            </div>
-            <div class="column-toggle mt-3" data-col-toggle="especializacao">
-              <div class="column-toggle__header">
-                <span class="label">Colunas visíveis</span>
-                <span class="hint text-muted small">Marque para exibir na tabela</span>
-              </div>
-              <div class="toggle-options"></div>
-            </div>
-          </div>
-        </div>
-                <div class="card mb-3">
-        <div class="card-body d-flex align-items-center gap-2">
-          <div>
-            <p class="small text-muted mb-0">
-            Veja aqui os cursos que batem com seus filtros. Clique no cabeçalho para ordenar ou ative mais colunas se precisar.
-            </p>
-          </div>
-        </div>
-      </div>
-        <div id="grid-especializacao"></div>
-      </section>
-
-      <section class="tab-panel d-none" data-panel="pos">
-        <div class="card mb-3">
-          <div class="card-body">
-             <details class="filters-accordion">
-          <summary>Veja opções para filtrar dados</summary>
-            <div class="row g-3">
-              <div class="col-md-3">
-                <label class="form-label">Nível</label>
-                <div class="multi-box" id="pos-nivel" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar nível cadastrado na CAPES">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Área de conhecimento</label>
-                <div class="multi-box" id="pos-area" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar área">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Nota CAPES</label>
-                <div class="multi-box" id="pos-nota" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar nota">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Modalidade</label>
-                <div class="multi-box" id="pos-modalidade" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar modalidade">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">UF</label>
-                <div class="multi-box" id="pos-uf" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar por estado">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Município</label>
-                <div class="multi-box" id="pos-municipio" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar município">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Sigla da IES</label>
-                <div class="multi-box" id="pos-sigla" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar sigla">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-              <div class="col-md-3">
-                <label class="form-label">Nome da IES</label>
-                <div class="multi-box" id="pos-ies" data-multibox="true">
-                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar instituição">
-                  <div class="multi-status small text-muted"></div>
-                  <div class="multi-options"></div>
-                </div>
-              </div>
-            </div>
-            <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 mt-3">
-              <button class="btn btn-primary w-100 w-md-auto" id="pos-filtrar">Aplicar filtros</button>
-              <button class="btn btn-outline-secondary w-100 w-md-auto" id="pos-limpar">Limpar filtros</button>
-              <button class="btn btn-outline-success w-100 w-md-auto ms-md-auto" id="pos-download">Baixar CSV</button>
-            </div>
-            <div class="column-toggle mt-3" data-col-toggle="pos">
-              <div class="column-toggle__header">
-                <span class="label">Colunas visíveis</span>
-                <span class="hint text-muted small">Marque para exibir na tabela</span>
-              </div>
-              <div class="toggle-options"></div>
-            </div>
-          </div>
-        </div>
-                <div class="card mb-3">
-        <div class="card-body d-flex align-items-center gap-2">
-          <div>
-            <p class="small text-muted mb-0">
-            Veja aqui os cursos que batem com seus filtros. Clique no cabeçalho para ordenar ou ative mais colunas se precisar.
-            </p>
-          </div>
-        </div>
-      </div>
-        <div id="grid-pos"></div>
-      </section>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sql.js@1.11.0/dist/sql-wasm.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
-    <script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.3/dist/ag-grid-community.noStyle.min.js"></script>
     <script type="module" src="./app.js"></script>
   </body>
 </html>

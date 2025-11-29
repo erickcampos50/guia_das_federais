@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Guia das Federais - Encontre cursos de graduação, especialização, mestrado e doutorado das universidades públicas do Brasil num único lugar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/modern-normalize/2.0.0/modern-normalize.css">
+    <link rel="stylesheet" href="https://unpkg.com/tabulator-tables@5.6.2/dist/css/tabulator.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3/dist/style.css">
+    <link rel="stylesheet" href="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.css">
+    <link rel="stylesheet" href="https://uicdn.toast.com/grid/latest/tui-grid.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.3/styles/ag-grid.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.3/styles/ag-theme-quartz.css">
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body>
+    <div class="container py-4">
+      <header class="mb-4 hero">
+        <div class="hero__content">
+          <p class="eyebrow">Guia das Federais</p>
+          <h1 class="hero__title">Encontre cursos de graduação, especialização, mestrado e doutorado das universidades públicas do Brasil num único lugar</h1>
+          <p class="hero__subtitle">
+            Juntamos em um só lugar dados que costumam ficar espalhados em sites e PDFs para ajudar você a planejar a vida acadêmica com mais clareza.
+            Iniciativa voluntária por isso use como referência, mas confirme sempre nos sites oficiais antes de decidir.
+          </p>
+          <div class="hero__chips">
+            <span class="chip chip--primary">Planeje sem perder tempo</span>
+            <span class="chip chip--secondary">Compare cursos lado a lado</span>
+            <span class="chip chip--accent">Decisões mais seguras</span>
+          </div>
+          <div class="hero__steps">
+            <div class="step">
+              <span class="step__icon">1</span>
+              <div>
+                <p class="step__title">Escolha a aba</p>
+                <p class="step__text">Graduação, Especialização ou Mestrado/Doutorado.</p>
+              </div>
+            </div>
+            <div class="step">
+              <span class="step__icon">2</span>
+              <div>
+                <p class="step__title">Filtre e busque</p>
+                <p class="step__text">Use as listas com busca em tempo real para marcar os critérios.</p>
+              </div>
+            </div>
+            <div class="step">
+              <span class="step__icon">3</span>
+              <div>
+                <p class="step__title">Veja a tabela</p>
+                <p class="step__text">Mostra só as 4 colunas principais; ative mais colunas conforme precisar.</p>
+              </div>
+            </div>
+          </div>
+          <details class="hero__details">
+            <summary>Limitações e dicas rápidas</summary>
+            <ul class="hero__list">
+              <li>Buscas são exatas pelo texto exibido; tente variações de nome se não achar o curso.</li>
+              <!-- <li>Primeiro acesso baixa a base compactada; depois, tudo roda mais rápido no seu navegador.</li> -->
+              <li>Use “Baixar CSV” para baixar a sua seleção em formato planilha.</li>
+              <li>Projeto voluntário sem garantias: valide datas, vagas e pré-requisitos na instituição.</li>
+              <div id="status" class="small text-muted hero__status">Carregando...</div>
+            </ul>
+          </details>
+          
+        </div>
+        <div class="hero__visual">
+          <div class="hero__blob"></div>
+          <div class="hero__card">
+            <p class="label">Consulte</p>
+            <p class="value">+5.000 cursos</p>
+            <p class="hint">de universidades federais e estaduais</p>
+          </div>
+          <div class="hero__card hero__card--alt">
+            <!-- <p class="label">Tabs</p> -->
+            <!-- <p class="value">3</p> -->
+            <p class="label">Graduação Especialização Mestrado/Doutorado</p>
+          </div>
+        </div>
+      </header>
+
+      <nav class="nav nav-pills gap-2 mb-3 flex-column flex-md-row" id="tabNav">
+        <button class="btn btn-outline-primary active w-100 w-md-auto" data-tab="graduacao" type="button">Graduação</button>
+        <button class="btn btn-outline-primary w-100 w-md-auto" data-tab="especializacao" type="button">Especialização</button>
+        <button class="btn btn-outline-primary w-100 w-md-auto" data-tab="pos" type="button">Mestrado e Doutorado</button>
+      
+      </nav>
+      
+      <section class="tab-panel" data-panel="graduacao">
+        <div class="card mb-3">
+        <div class="card-body">
+        <details class="filters-accordion">
+          <summary>Veja opções para filtrar os cursos e refinar sua busca</summary>
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label">Nome do curso</label>
+                <div class="multi-box" id="grad-curso" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Digite o nome e selecione as opções">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+
+
+
+
+              <div class="col-md-3">
+                <label class="form-label">UF</label>
+                <div class="multi-box" id="grad-uf" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar por estado">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Município</label>
+                <div class="multi-box" id="grad-municipio" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar município">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Área de conhecimento</label>
+                <div class="multi-box" id="grad-area" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtre pela área do curso">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Instituição</label>
+                <div class="multi-box" id="grad-ies" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar instituição">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              
+
+              <div class="col-md-3">
+                <label class="form-label">Grau</label>
+                <div class="multi-box" id="grad-grau" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar grau">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Modalidade</label>
+                <div class="multi-box" id="grad-modalidade" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar modalidade">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 mt-3">
+              <button class="btn btn-primary w-100 w-md-auto" id="grad-filtrar">Aplicar filtros</button>
+              <button class="btn btn-outline-secondary w-100 w-md-auto" id="grad-limpar">Limpar filtros</button>
+              <button class="btn btn-outline-success w-100 w-md-auto ms-md-auto" id="grad-download">Baixar planilha CSV</button>
+            </div>
+            <div class="column-toggle mt-3" data-col-toggle="graduacao">
+              <div class="column-toggle__header">
+                <span class="label">Colunas visíveis</span>
+                <span class="hint text-muted small">Marque para exibir a coluna na tabela</span>
+              </div>
+              <div class="toggle-options"></div>
+            </div>
+          </div>
+        </div>
+        <!-- <div class="card mb-3">
+        <div class="card-body d-flex align-items-center gap-2">
+          <div>
+            <p class="small text-muted mb-0">
+            Veja aqui os cursos que batem com seus filtros. Clique no cabeçalho para ordenar ou ative mais colunas se precisar. 
+            </p>
+          </div>
+        </div>
+      </div> -->
+        <div class="grid-gallery" data-grid-shelf="graduacao">
+          <div class="grid-card">
+            <div class="grid-card__title">Tabulator</div>
+            <div id="grid-tabulator-graduacao" class="grid-card__body"></div>
+          </div>
+          <div class="grid-card">
+            <div class="grid-card__title">Simple-DataTables</div>
+            <div id="grid-simple-graduacao" class="grid-card__body"></div>
+          </div>
+          <div class="grid-card">
+            <div class="grid-card__title">AG Grid (Community)</div>
+            <div id="grid-ag-graduacao" class="grid-card__body ag-theme-quartz"></div>
+          </div>
+          <div class="grid-card">
+            <div class="grid-card__title">Toast UI Grid</div>
+            <div id="grid-toast-graduacao" class="grid-card__body"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel d-none" data-panel="especializacao">
+        <div class="card mb-3">
+          <div class="card-body">
+            <details class="filters-accordion">
+            <summary>Veja opções para filtrar dados</summary>
+            <div class="row g-3">
+
+              <div class="col-md-3">
+                <label class="form-label">Nome do curso</label>
+                <div class="multi-box" id="esp-curso" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Digite o nome e selecione as opções">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+
+
+
+              <div class="col-md-3">
+                <label class="form-label">Área de conhecimento</label>
+                <div class="multi-box" id="esp-area" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar área do curso">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Modalidade</label>
+                <div class="multi-box" id="esp-modalidade" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar modalidade">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">UF</label>
+                <div class="multi-box" id="esp-uf" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar por estado">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Município</label>
+                <div class="multi-box" id="esp-municipio" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar município">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Instituição</label>
+                <div class="multi-box" id="esp-ies" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar instituição">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+           
+              <div class="col-md-3">
+                <label class="form-label">Carga horária mínima</label>
+                <input id="esp-carga-min" type="number" class="form-control" min="0" placeholder="180">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Carga horária máxima</label>
+                <input id="esp-carga-max" type="number" class="form-control" min="0" placeholder="1440">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Duração mínima (meses)</label>
+                <input id="esp-duracao-min" type="number" class="form-control" min="0" placeholder="3">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Duração máxima (meses)</label>
+                <input id="esp-duracao-max" type="number" class="form-control" min="0" placeholder="48">
+              </div>
+            </div>
+            <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 mt-3">
+              <button class="btn btn-primary w-100 w-md-auto" id="esp-filtrar">Aplicar filtros</button>
+              <button class="btn btn-outline-secondary w-100 w-md-auto" id="esp-limpar">Limpar filtros</button>
+              <button class="btn btn-outline-success w-100 w-md-auto ms-md-auto" id="esp-download">Baixar CSV</button>
+            </div>
+            <div class="column-toggle mt-3" data-col-toggle="especializacao">
+              <div class="column-toggle__header">
+                <span class="label">Colunas visíveis</span>
+                <span class="hint text-muted small">Marque para exibir na tabela</span>
+              </div>
+              <div class="toggle-options"></div>
+            </div>
+          </div>
+        </div>
+                <div class="card mb-3">
+      <div class="card-body d-flex align-items-center gap-2">
+          <div>
+            <p class="small text-muted mb-0">
+            Veja aqui os cursos que batem com seus filtros. Clique no cabeçalho para ordenar ou ative mais colunas se precisar.
+            </p>
+          </div>
+        </div>
+      </div>
+        <div class="grid-gallery" data-grid-shelf="especializacao">
+          <div class="grid-card">
+            <div class="grid-card__title">Tabulator</div>
+            <div id="grid-tabulator-especializacao" class="grid-card__body"></div>
+          </div>
+          <div class="grid-card">
+            <div class="grid-card__title">Simple-DataTables</div>
+            <div id="grid-simple-especializacao" class="grid-card__body"></div>
+          </div>
+          <div class="grid-card">
+            <div class="grid-card__title">AG Grid (Community)</div>
+            <div id="grid-ag-especializacao" class="grid-card__body ag-theme-quartz"></div>
+          </div>
+          <div class="grid-card">
+            <div class="grid-card__title">Toast UI Grid</div>
+            <div id="grid-toast-especializacao" class="grid-card__body"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel d-none" data-panel="pos">
+        <div class="card mb-3">
+          <div class="card-body">
+             <details class="filters-accordion">
+          <summary>Veja opções para filtrar dados</summary>
+            <div class="row g-3">
+              <div class="col-md-3">
+                <label class="form-label">Nível</label>
+                <div class="multi-box" id="pos-nivel" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar nível cadastrado na CAPES">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Área de conhecimento</label>
+                <div class="multi-box" id="pos-area" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar área">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Nota CAPES</label>
+                <div class="multi-box" id="pos-nota" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar nota">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Modalidade</label>
+                <div class="multi-box" id="pos-modalidade" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar modalidade">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">UF</label>
+                <div class="multi-box" id="pos-uf" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar por estado">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Município</label>
+                <div class="multi-box" id="pos-municipio" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar município">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Sigla da IES</label>
+                <div class="multi-box" id="pos-sigla" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar sigla">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">Nome da IES</label>
+                <div class="multi-box" id="pos-ies" data-multibox="true">
+                  <input type="search" class="form-control form-control-sm multi-search" placeholder="Filtrar instituição">
+                  <div class="multi-status small text-muted"></div>
+                  <div class="multi-options"></div>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 mt-3">
+              <button class="btn btn-primary w-100 w-md-auto" id="pos-filtrar">Aplicar filtros</button>
+              <button class="btn btn-outline-secondary w-100 w-md-auto" id="pos-limpar">Limpar filtros</button>
+              <button class="btn btn-outline-success w-100 w-md-auto ms-md-auto" id="pos-download">Baixar CSV</button>
+            </div>
+            <div class="column-toggle mt-3" data-col-toggle="pos">
+              <div class="column-toggle__header">
+                <span class="label">Colunas visíveis</span>
+                <span class="hint text-muted small">Marque para exibir na tabela</span>
+              </div>
+              <div class="toggle-options"></div>
+            </div>
+          </div>
+        </div>
+                <div class="card mb-3">
+      <div class="card-body d-flex align-items-center gap-2">
+          <div>
+            <p class="small text-muted mb-0">
+            Veja aqui os cursos que batem com seus filtros. Clique no cabeçalho para ordenar ou ative mais colunas se precisar.
+            </p>
+          </div>
+        </div>
+      </div>
+        <div class="grid-gallery" data-grid-shelf="pos">
+          <div class="grid-card">
+            <div class="grid-card__title">Tabulator</div>
+            <div id="grid-tabulator-pos" class="grid-card__body"></div>
+          </div>
+          <div class="grid-card">
+            <div class="grid-card__title">Simple-DataTables</div>
+            <div id="grid-simple-pos" class="grid-card__body"></div>
+          </div>
+          <div class="grid-card">
+            <div class="grid-card__title">AG Grid (Community)</div>
+            <div id="grid-ag-pos" class="grid-card__body ag-theme-quartz"></div>
+          </div>
+          <div class="grid-card">
+            <div class="grid-card__title">Toast UI Grid</div>
+            <div id="grid-toast-pos" class="grid-card__body"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sql.js@1.11.0/dist/sql-wasm.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+    <script src="https://unpkg.com/tabulator-tables@5.6.2/dist/js/tabulator.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3/dist/umd/simple-datatables.js"></script>
+    <script src="https://uicdn.toast.com/tui.pagination/latest/tui-pagination.min.js"></script>
+    <script src="https://uicdn.toast.com/grid/latest/tui-grid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@31.0.3/dist/ag-grid-community.noStyle.min.js"></script>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
