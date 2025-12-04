@@ -1,6 +1,6 @@
 const DB_URL = "./public/data/guia.sqlite.gz";
 const DB_CACHE_KEY = "guia-sqlite-v2";
-const GRID_LIMIT = 400;
+const GRID_LIMIT = 1000;
 
 const datasets = {
   graduacao: {
@@ -8,8 +8,10 @@ const datasets = {
     label: "Graduação",
     table: "graduacao",
     orderBy: "nome_curso, nome_ies, uf",
+    defaultColumns: ["nome_curso", "link_resolvido", "nome_ies", "municipio", "uf"],
     columns: [
       { id: "nome_curso", name: "Curso" },
+      { id: "link_resolvido", name: "Link automático" },
       { id: "nome_ies", name: "Instituição" },
       { id: "municipio", name: "Município" },
       { id: "uf", name: "UF" },
@@ -17,6 +19,7 @@ const datasets = {
       { id: "modalidade", name: "Modalidade" },
       { id: "area_conhecimento", name: "Área" },
       { id: "vagas_autorizadas", name: "Vagas autorizadas" },
+      
     ],
     filters: [
       { type: "multi", id: "grad-grau", column: "grau" },
@@ -38,9 +41,11 @@ const datasets = {
     prefix: "esp",
     label: "Especialização",
     table: "especializacao",
-    orderBy: "nome_especializacao, nome_ies, uf",
+    orderBy: "link_resolvido,nome_especializacao, nome_ies, uf",
+    defaultColumns: ["nome_especializacao", "link_resolvido", "nome_ies", "municipio", "uf"],
     columns: [
       { id: "nome_especializacao", name: "Curso" },
+      { id: "link_resolvido", name: "Link automático" },
       { id: "nome_ies", name: "Instituição" },
       { id: "municipio", name: "Município" },
       { id: "uf", name: "UF" },
@@ -48,6 +53,7 @@ const datasets = {
       { id: "carga_horaria", name: "Carga horária" },
       { id: "duracao_meses", name: "Duração (meses)" },
       { id: "area_conhecimento", name: "Área" },
+      
     ],
     filters: [
       { type: "multi", id: "esp-area", column: "area_conhecimento" },
@@ -65,8 +71,11 @@ const datasets = {
     label: "Mestrado/Doutorado",
     table: "pos",
     orderBy: "nome_programa, sigla_ies, uf",
+    defaultColumns: ["nome_programa", "sigla_ies", "uf", "municipio", "link_resolvido", "link"],
     columns: [
       { id: "nome_programa", name: "Programa" },
+      { id: "link_resolvido", name: "Link automático" },
+      { id: "link", name: "Link plataforma Sucupira" },
       { id: "sigla_ies", name: "Sigla IES" },
       { id: "uf", name: "UF" },
       { id: "municipio", name: "Município" },
@@ -74,21 +83,21 @@ const datasets = {
       { id: "nota_conceito", name: "Nota" },
       { id: "nome_ies", name: "Instituição" },
       { id: "nivel_programa", name: "Nível" },
-      { id: "modalidade", name: "Modalidade" },
-      { id: "link", name: "Mais informações" },
+      // { id: "modalidade", name: "Modalidade" },
+      
     ],
     filters: [
       { type: "multi", id: "pos-nivel", column: "nivel_programa", operator: "like" },
       { type: "multi", id: "pos-area", column: "area_conhecimento" },
       { type: "multi", id: "pos-nota", column: "nota_conceito" },
-      { type: "multi", id: "pos-modalidade", column: "modalidade" },
+      // { type: "multi", id: "pos-modalidade", column: "modalidade" },
       { type: "multi", id: "pos-uf", column: "uf" },
       { type: "multi", id: "pos-municipio", column: "municipio" },
       { type: "multi", id: "pos-sigla", column: "sigla_ies" },
       { type: "multi", id: "pos-ies", column: "nome_ies" },
     ],
     defaults: {
-      "pos-nivel": ["MESTRADO", "DOUTORADO"],
+      "pos-nivel": ["MESTRADO", "DOUTORADO","MESTRADO/DOUTORADO","DOUTORADO PROFISSIONAL","MESTRADO PROFISSIONAL","MESTRADO PROFISSIONAL/DOUTORADO PROFISSIONAL"],
     },
   },
 };
@@ -142,7 +151,23 @@ async function loadDatabase() {
     await localforage.setItem(DB_CACHE_KEY, bytes);
   }
 
-  return new SQL.Database(bytes);
+  const database = new SQL.Database(bytes);
+  ensureLinkColumn(database);
+  return database;
+}
+
+function ensureLinkColumn(database) {
+  ["graduacao", "especializacao", "pos"].forEach((table) => {
+    const stmt = database.prepare(`PRAGMA table_info(${table})`);
+    const cols = [];
+    while (stmt.step()) {
+      cols.push(stmt.getAsObject().name);
+    }
+    stmt.free();
+    if (!cols.includes("link_resolvido")) {
+      database.exec(`ALTER TABLE ${table} ADD COLUMN link_resolvido TEXT`);
+    }
+  });
 }
 
 function initGrids() {
@@ -237,7 +262,10 @@ function isMultiBox(el) {
 
 function getSelectedColumns(key) {
   if (!selectedColumns[key] || !selectedColumns[key].length) {
-    selectedColumns[key] = datasets[key].columns.slice(0, 4).map((c) => c.id);
+    const cfg = datasets[key];
+    selectedColumns[key] = (cfg.defaultColumns && cfg.defaultColumns.length
+      ? cfg.defaultColumns
+      : cfg.columns.slice(0, 4).map((c) => c.id));
   }
   return selectedColumns[key];
 }
@@ -247,10 +275,12 @@ function buildGridColumns(cfg, colIds) {
   return colIds.map((id) => {
     const col = map.get(id);
     if (!col) return { id, name: id, sort: true };
-    if (col.id === "link") {
+    if (col.id === "link" || col.id === "link_resolvido") {
       return {
+        id: col.id,
         name: col.name,
         formatter: (cell) => (cell ? gridjs.html(`<a href="${cell}" target="_blank" rel="noopener">Abrir</a>`) : ""),
+        sort: true,
       };
     }
     return { id: col.id, name: col.name, sort: true };

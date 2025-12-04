@@ -1,4 +1,6 @@
 """
+NÃO UTILIZAR ESTE SCRIPT DIRETAMENTE PORQUE O BANCO DE DADOS AGORA POSSUI UMA SÉRIE DE DADOS FRUTO DE PROCESSOS DE RASPAGEM POSTERIORES.
+
 Gera um banco SQLite único com as três bases (graduação, especialização e pós).
 
 Uso:
