@@ -80,8 +80,9 @@ def select_rows(
   start: int,
   end: Optional[int],
   include_processed: bool,
-) -> List[Tuple[int, str, str, str]]:
-  where = f"WHERE {FLAG_COL} = 0 OR {FLAG_COL} IS NULL" if not include_processed else ""
+) -> List[Tuple[int, str, str, str, Optional[str]]]:
+  base_condition = f"{FLAG_COL} = 0 OR {FLAG_COL} IS NULL OR {LINK_COL} LIKE 'https://www.google.com/sorry/%'"
+  where = f"WHERE {base_condition}" if not include_processed else ""
   limit_clause = ""
   params: List[int] = []
   # 1-based to offset
@@ -95,14 +96,14 @@ def select_rows(
     params.append(offset)
 
   query = f"""
-    SELECT rowid, nome_ies, {curso_col}, {municipio_col}
+    SELECT rowid, nome_ies, {curso_col}, {municipio_col}, {LINK_COL}
     FROM {table}
     {where}
     ORDER BY rowid
     {limit_clause};
   """
   cur = conn.execute(query, params)
-  return [(row[0], row[1], row[2], row[3]) for row in cur.fetchall()]
+  return [(row[0], row[1], row[2], row[3], row[4]) for row in cur.fetchall()]
 
 
 def resolve_url(url: str, session: requests.Session, retries: int = 3, sleep: float = 1.0) -> str:
@@ -110,15 +111,25 @@ def resolve_url(url: str, session: requests.Session, retries: int = 3, sleep: fl
     "User-Agent": random_user_agent(),
     "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.8",
   }
+  sorry_prefix = "https://www.google.com/sorry/"
   for attempt in range(1, retries + 1):
     try:
       resp: Response = session.get(url, allow_redirects=True, timeout=8, headers=headers)
       if resp.history:
-        return clean_redirect(resp.url)
+        final = clean_redirect(resp.url)
+        if final.startswith(sorry_prefix):
+          return final
+        return final
       if 300 <= resp.status_code < 400:
-        return clean_redirect(resp.headers.get("Location", ""))
+        final = clean_redirect(resp.headers.get("Location", ""))
+        if final.startswith(sorry_prefix):
+          return final
+        return final
       if resp.status_code == 200:
-        return clean_redirect(resp.url)
+        final = clean_redirect(resp.url)
+        if final.startswith(sorry_prefix):
+          return final
+        return final
     except requests.RequestException:
       pass
     time.sleep(jitter_sleep(sleep))
@@ -183,7 +194,7 @@ def main():
     )
     total = len(rows)
     print(f"[{table}] Registros a processar: {total}")
-    for idx, (rowid, nome_ies, curso, municipio) in enumerate(rows, start=1):
+    for idx, (rowid, nome_ies, curso, municipio, current_link) in enumerate(rows, start=1):
       terms = " ".join([nome_ies, curso, municipio])
       lucky_url = f"https://www.google.com/search?q={quote_plus(terms)}&btnI=I"
       final_url = resolve_url(lucky_url, session, retries=args.retries, sleep=args.sleep)
