@@ -1,7 +1,7 @@
 const DB_URL = "./public/data/guia.sqlite.gz";
 const DB_CACHE_KEY = "guia-sqlite-v3";
-const GRID_LIMIT = 5;
-const PAGE_SIZE = 50;
+const GRID_LIMIT = 400;
+const PAGE_SIZE = 20;
 const DEFAULT_VISIBLE_COLS = 3;
 const LINKED_FIELDS = new Set(["nome_curso", "nome_especializacao", "nome_programa"]);
 
@@ -10,7 +10,7 @@ const datasets = {
     prefix: "grad",
     label: "Graduação",
     table: "graduacao",
-    orderBy: "nome_curso, nome_ies, municipio",
+    orderBy: "nome_curso, municipio",
     columns: [
       
       { id: "nome_ies", name: "Instituição" },
@@ -41,7 +41,7 @@ const datasets = {
     prefix: "esp",
     label: "Especialização",
     table: "especializacao",
-    orderBy: "nome_especializacao, nome_ies, municipio",
+    orderBy: "nome_especializacao, municipio",
     columns: [
       
       { id: "nome_ies", name: "Instituição" },
@@ -90,7 +90,7 @@ const datasets = {
     prefix: "pos",
     label: "Mestrado/Doutorado",
     table: "pos",
-    orderBy: "nome_programa, sigla_ies, nivel_programa, municipio",
+    orderBy: "nome_programa, municipio",
     columns: [
       { id: "sigla_ies", name: "Sigla Instituição" },
       { id: "nome_programa", name: "Programa" },
@@ -230,7 +230,7 @@ function refreshGridColumns(key) {
   const cfg = datasets[key];
   if (!grid || !cfg) return;
   const colDefs = buildAgColumns(cfg.columns, new Set(getSelectedColumns(key)));
-  grid.api.setColumnDefs(colDefs);
+  grid.api.updateGridOptions({ columnDefs: colDefs });
   grid.api.sizeColumnsToFit();
 }
 
@@ -639,7 +639,7 @@ function renderAgGrid(key, cfg, rows) {
   if (!container || typeof agGrid === "undefined") return;
   const colDefs = buildAgColumns(cfg.columns, new Set(getSelectedColumns(key)));
   if (gridInstances[key]) {
-    gridInstances[key].api.setColumnDefs(colDefs);
+    gridInstances[key].api.updateGridOptions({ columnDefs: colDefs });
     gridInstances[key].api.setRowData(rows);
     gridInstances[key].api.sizeColumnsToFit();
     return;
@@ -649,7 +649,7 @@ function renderAgGrid(key, cfg, rows) {
     rowData: rows,
     defaultColDef: {
       sortable: true,
-      filter: true,
+      // filter: true,
       resizable: true,
       minWidth: 140,
       flex: 1,
@@ -662,6 +662,44 @@ function renderAgGrid(key, cfg, rows) {
     domLayout: "autoHeight",
     onFirstDataRendered: (params) => params.api.sizeColumnsToFit(),
     onGridSizeChanged: (params) => params.api.sizeColumnsToFit(),
+    localeText: {
+      page: "Página",
+      more: "mais",
+      to: "até",
+      of: "de",
+      next: "Próxima",
+      last: "Última",
+      first: "Primeira",
+      previous: "Anterior",
+      loadingOoo: "Carregando...",
+      selectAll: "Selecionar tudo",
+      searchOoo: "Pesquisar...",
+      blanks: "(em branco)",
+      filterOoo: "Filtrar...",
+      applyFilter: "Aplicar filtro...",
+      equals: "Igual",
+      notEqual: "Diferente",
+      lessThan: "Menor que",
+      greaterThan: "Maior que",
+      lessThanOrEqual: "Menor ou igual",
+      greaterThanOrEqual: "Maior ou igual",
+      inRange: "Entre",
+      contains: "Contém",
+      notContains: "Não contém",
+      startsWith: "Começa com",
+      endsWith: "Termina com",
+      andCondition: "E",
+      orCondition: "Ou",
+      pageSize: "Resultados por página",
+      rowsPerPage: "Resultados por página",
+      pageSizeSelectorLabel: "Resultados por página",
+      rangeChart: "Gráfico",
+      column: "Coluna",
+      group: "Grupo",
+      pivotPanelShow: "Mostrar painel de pivô",
+      toPage: "Ir para",
+      
+    },
   };
   const api = agGrid.createGrid(container, gridOptions);
   gridInstances[key] = { api };
