@@ -1,6 +1,6 @@
 const DB_URL = "./public/data/guia.sqlite.gz";
 const DB_CACHE_KEY = "guia-sqlite-v3";
-const GRID_LIMIT = 400;
+const GRID_LIMIT = 5;
 const PAGE_SIZE = 50;
 const DEFAULT_VISIBLE_COLS = 3;
 const LINKED_FIELDS = new Set(["nome_curso", "nome_especializacao", "nome_programa"]);
@@ -101,7 +101,7 @@ const datasets = {
       { id: "nota_conceito", name: "Nota" },
       { id: "nome_ies", name: "Instituição" },
       
-      { id: "modalidade", name: "Modalidade" },
+      { id: "modalidade", name: "Tipo (modalidade)" },
       { id: "link_resolvido", name: "Link Automático" },
       { id: "link", name: "Link Capes" },
       
@@ -111,7 +111,7 @@ const datasets = {
       { type: "multi", id: "pos-nivel", column: "nivel_programa", operator: "like", label: "Nível", placeholder: "Filtrar nível" },
       { type: "multi", id: "pos-area", column: "area_conhecimento", label: "Área de conhecimento", placeholder: "Filtrar área" },
       { type: "multi", id: "pos-nota", column: "nota_conceito", label: "Nota CAPES", placeholder: "Filtrar nota" },
-      { type: "multi", id: "pos-modalidade", column: "modalidade", label: "Modalidade", placeholder: "Filtrar modalidade" },
+      { type: "multi", id: "pos-modalidade", column: "modalidade", label: "Tipo (modalidade)", placeholder: "Filtrar modalidade" },
       { type: "multi", id: "pos-uf", column: "uf", label: "UF", placeholder: "Filtrar estado" },
       { type: "multi", id: "pos-municipio", column: "municipio", label: "Município", placeholder: "Filtrar município" },
       { type: "multi", id: "pos-sigla", column: "sigla_ies", label: "Sigla da Instituição", placeholder: "Filtrar sigla" },

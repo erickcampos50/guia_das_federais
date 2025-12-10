@@ -34,9 +34,10 @@
             <p class="audience-card__hint">Use os filtros por estado, cidade, área e tipo de curso para montar sua lista de opções e decidir com calma.</p>
           </div>
           <div class="hero__chips">
-            <span class="chip chip--primary">Veja o mapa dos cursos públicos</span>
-            <span class="chip chip--secondary">Filtre por cidade, área e formato</span>
-            <span class="chip chip--accent">Monte sua lista para decidir com calma</span>
+            <span class="chip chip--primary">Cursos de universidades públicas de todo o Brasil</span>
+            <span class="chip chip--secondary">Federais, estaduais, municipais e fundações</span>
+            <span class="chip chip--accent">Filtre por instituição, curso, município e mais</span>
+            
           </div>
           <div class="hero__steps">
             
@@ -45,7 +46,7 @@
           </div>
 
           <details class="hero__details">
-            <summary>Saiba como aproveitar este guia</summary>
+            <summary>Dicas e informações básicas</summary>
             <section class="info-panels">
               <div class="info-card">
                 <p class="info-card__label">Quantos cursos existem aqui?</p>
@@ -117,21 +118,20 @@
 
           
           <details class="hero__details">
-            <summary>Sobre os dados e limitações do guia</summary>
+            <summary>Sobre a fonte dos dados e limitações do site</summary>
             <div class="credits__card">
               <p class="credits__text">
                 Este site é um projeto pessoal e voluntário criado para facilitar o acesso a informações sobre cursos de graduação, especialização, mestrado e doutorado oferecidos por universidades públicas brasileiras (federais, estaduais e municipais).
               </p>
-              <div class="credits__meta">
-                <span class="chip chip--primary">Projeto pessoal e voluntário</span>
-                <span class="chip chip--secondary">Dados oficiais e-MEC e Plataforma Sucupira</span>
-                <span class="chip chip--accent">Melhor esforço, links podem mudar</span>
-              </div>
               <p class="credits__text">
                 Os dados apresentados aqui foram extraídos de bases públicas oficiais, como o e-MEC e a Plataforma Sucupira, e organizados em um formato mais simples de visualizar e comparar.
               </p>
               <p class="credits__text">
                 Importante: este não é um site oficial do governo nem das universidades. Apesar do cuidado na coleta e organização das informações, podem existir erros, cursos podem ter sido criados, alterados ou encerrados depois da última atualização e algumas ofertas podem não aparecer neste guia.
+              </p>
+            
+              <p class="credits__text">
+                A responsabilidade pela oferta dos cursos, pelos processos seletivos e pelas regras de ingresso é exclusivamente das universidades e demais instituições de ensino. Não me responsabilizo por decisões tomadas somente com base nas informações deste site nem por eventuais erros, omissões ou desatualizações dos dados.
               </p>
               <p class="credits__text">Por isso, utilize o site como referência inicial e sempre confirme diretamente nos canais oficiais da instituição:</p>
               <ul class="credits__list">
@@ -139,13 +139,6 @@
                 <li>detalhes como duração, carga horária, modalidade e campus</li>
                 <li>regras de ingresso, editais, prazos e documentos exigidos</li>
               </ul>
-              <p class="credits__text">
-                A responsabilidade pela oferta dos cursos, pelos processos seletivos e pelas regras de ingresso é exclusivamente das universidades e demais instituições de ensino. Eu, Erick Campos, não me responsabilizo por decisões tomadas somente com base nas informações deste site nem por eventuais erros, omissões ou desatualizações dos dados.
-              </p>
-              <p class="credits__text">
-                Se encontrar alguma informação incorreta ou desatualizada, ou quiser sugerir melhorias, entre em contato pelo e-mail <a href="mailto:erick.campos@ufjf.br">erick.campos@ufjf.br</a> ou pelo repositório do projeto.
-              </p>
-              <p class="credits__text small text-muted">Última atualização geral dos dados: mm/aaaa.</p>
             </div>
 
             <div id="status" class="small text-muted hero__status">Carregando...</div>
@@ -190,7 +183,8 @@
                 <span class="step__icon">2</span>
                 <div>
                   <p class="step__title">Ajuste os filtros para definir quais informações vão aparecer</p>
-                  <p class="step__text">Combine estado, cidade, área e instituição para encontrar cursos que cabem na sua realidade e nos seus sonhos.</p>
+                  <p class="step__text"> Você também pode escolher visualizar apenas parte das informações. Basta informar exatamente o que deseja filtrar. Como a busca interpreta tudo de forma literal, é bom digitar com atenção para que o resultado apareça do jeito esperado. Tudo isso ajuda a combinar estado, cidade, área e instituição e encontrar cursos alinhados com a sua realidade e seus objetivos.</p>
+                 
                 </div>
               </div>
               <details class="filters-accordion">
@@ -227,6 +221,15 @@
               <button class="btn btn-download-alt w-100 w-md-auto" data-role="download-pdf" type="button">Baixar/Compartilhar resultados em PDF</button>
             </div>
           </div>
+          <section class="credits-section mt-4">
+            <div class="card credits-card p-4" style="font-size: 0.92em; padding-left: 2em; padding-right: 2em; text-align: center;">
+              <p class="credits-title fw-bold mb-1"></p>
+              <p class="credits-text mb-2">
+                Este site é um projeto voluntário desenvolvido Erick Campos <span class="text-muted">(<a href="mailto:erick.campos@ufjf.br">erick.campos@ufjf.br</a>)</span> sem vínculo oficial com instituições de ensino ou órgãos governamentais. Os dados apresentados são coletados de bases públicas oficiais, mas podem conter erros ou desatualizações. Sempre confirme as informações diretamente com a instituição de ensino antes de tomar decisões acadêmicas.
+              </p>
+            </div>
+          </section>
+          </section>
         </section>
       </template>
 
