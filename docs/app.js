@@ -3,6 +3,7 @@ const DB_CACHE_KEY = "guia-sqlite-v3";
 const GRID_LIMIT = 400;
 const PAGE_SIZE = 50;
 const DEFAULT_VISIBLE_COLS = 3;
+const LINKED_FIELDS = new Set(["nome_curso", "nome_especializacao", "nome_programa"]);
 
 const datasets = {
   graduacao: {
@@ -10,10 +11,8 @@ const datasets = {
     label: "Graduação",
     table: "graduacao",
     orderBy: "nome_curso, nome_ies, municipio",
-    defaultColumns: ["nome_curso", "link_resolvido", "nome_ies", "municipio", "uf"],
     columns: [
       
-      { id: "link_resolvido", name: "Link automático" },
       { id: "nome_ies", name: "Instituição" },
       { id: "nome_curso", name: "Curso" },
       { id: "municipio", name: "Município" },
@@ -22,7 +21,7 @@ const datasets = {
       { id: "modalidade", name: "Modalidade" },
       { id: "area_conhecimento", name: "Área" },
       { id: "vagas_autorizadas", name: "Vagas autorizadas" },
-      
+      { id: "link_resolvido", name: "Link Automático" },
     ],
     filters: [
       { type: "multi", id: "grad-curso", column: "nome_curso", operator: "like", label: "Nome do curso", placeholder: "Filtrar curso" },
@@ -42,21 +41,18 @@ const datasets = {
     prefix: "esp",
     label: "Especialização",
     table: "especializacao",
-    orderBy: "link_resolvido,nome_especializacao, nome_ies, municipio",
-    defaultColumns: ["nome_especializacao", "link_resolvido", "nome_ies", "municipio", "uf"],
+    orderBy: "nome_especializacao, nome_ies, municipio",
     columns: [
       
       { id: "nome_ies", name: "Instituição" },
       { id: "nome_especializacao", name: "Curso" },
-      { id: "link_resolvido", name: "Link automático" },
-      { id: "nome_ies", name: "Instituição" },
       { id: "municipio", name: "Município" },
       { id: "uf", name: "UF" },
       { id: "modalidade", name: "Modalidade" },
       { id: "carga_horaria", name: "Carga horária" },
       { id: "duracao_meses", name: "Duração (meses)" },
       { id: "area_conhecimento", name: "Área" },
-      
+      { id: "link_resolvido", name: "Link Automático" },
     ],
     filters: [
       
@@ -94,22 +90,19 @@ const datasets = {
     prefix: "pos",
     label: "Mestrado/Doutorado",
     table: "pos",
-    orderBy: "nome_programa, sigla_ies, uf",
-    defaultColumns: ["nome_programa", "sigla_ies", "uf", "municipio", "link_resolvido", "link"],
+    orderBy: "nome_programa, sigla_ies, municipio",
     columns: [
       { id: "sigla_ies", name: "Sigla Instituição" },
       { id: "nome_programa", name: "Programa" },
-      { id: "link_resolvido", name: "Link automático" },
-      { id: "link", name: "Link plataforma Sucupira" },
-      { id: "sigla_ies", name: "Sigla IES" },
-      { id: "uf", name: "UF" },
       { id: "municipio", name: "Município" },
       { id: "uf", name: "UF" },
       { id: "area_conhecimento", name: "Área de conhecimento" },
       { id: "nota_conceito", name: "Nota" },
       { id: "nome_ies", name: "Instituição" },
       { id: "nivel_programa", name: "Nível" },
-      // { id: "modalidade", name: "Modalidade" },
+      { id: "modalidade", name: "Modalidade" },
+      { id: "link_resolvido", name: "Link Automático" },
+      { id: "link", name: "Link Capes" },
       
     ],
     filters: [
@@ -117,7 +110,7 @@ const datasets = {
       { type: "multi", id: "pos-nivel", column: "nivel_programa", operator: "like", label: "Nível", placeholder: "Filtrar nível" },
       { type: "multi", id: "pos-area", column: "area_conhecimento", label: "Área de conhecimento", placeholder: "Filtrar área" },
       { type: "multi", id: "pos-nota", column: "nota_conceito", label: "Nota CAPES", placeholder: "Filtrar nota" },
-      // { type: "multi", id: "pos-modalidade", column: "modalidade", label: "Modalidade", placeholder: "Filtrar modalidade" },
+      { type: "multi", id: "pos-modalidade", column: "modalidade", label: "Modalidade", placeholder: "Filtrar modalidade" },
       { type: "multi", id: "pos-uf", column: "uf", label: "UF", placeholder: "Filtrar estado" },
       { type: "multi", id: "pos-municipio", column: "municipio", label: "Município", placeholder: "Filtrar município" },
       { type: "multi", id: "pos-sigla", column: "sigla_ies", label: "Sigla da Instituição", placeholder: "Filtrar sigla" },
@@ -353,52 +346,8 @@ async function loadDatabase() {
     await localforage.setItem(DB_CACHE_KEY, bytes);
   }
 
-  const database = new SQL.Database(bytes);
-  ensureLinkColumn(database);
-  return database;
+  return new SQL.Database(bytes);
 }
-
-function ensureLinkColumn(database) {
-  ["graduacao", "especializacao", "pos"].forEach((table) => {
-    const stmt = database.prepare(`PRAGMA table_info(${table})`);
-    const cols = [];
-    while (stmt.step()) {
-      cols.push(stmt.getAsObject().name);
-    }
-    stmt.free();
-    if (!cols.includes("link_resolvido")) {
-      database.exec(`ALTER TABLE ${table} ADD COLUMN link_resolvido TEXT`);
-    }
-  });
-}
-
-function initGrids() {
-  Object.entries(datasets).forEach(([key, cfg]) => {
-    const container = document.getElementById(`grid-${key}`);
-    const cols = getSelectedColumns(key);
-    grids[key] = new gridjs.Grid({
-      columns: buildGridColumns(cfg, cols),
-      data: [],
-      pagination: { limit: 20 },
-      sort: true,
-      style: {
-        table: { width: "100%" },
-      },
-      language: {
-        search: { placeholder: "Filtrar..." },
-        pagination: {
-          previous: "Anterior",
-          next: "Próximo",
-          showing: "Mostrando",
-          of: "de",
-          to: "até",
-          results: "registros",
-        },
-      },
-    }).render(container);
-  });
-}
-
 
 async function hydrateFilters() {
   await Promise.all(
@@ -460,33 +409,6 @@ function fillSelect(id, values, defaults = []) {
 
 function isMultiBox(el) {
   return el?.dataset?.multibox === "true";
-}
-
-function getSelectedColumns(key) {
-  if (!selectedColumns[key] || !selectedColumns[key].length) {
-    const cfg = datasets[key];
-    selectedColumns[key] = (cfg.defaultColumns && cfg.defaultColumns.length
-      ? cfg.defaultColumns
-      : cfg.columns.slice(0, 4).map((c) => c.id));
-  }
-  return selectedColumns[key];
-}
-
-function buildGridColumns(cfg, colIds) {
-  const map = new Map(cfg.columns.map((c) => [c.id, c]));
-  return colIds.map((id) => {
-    const col = map.get(id);
-    if (!col) return { id, name: id, sort: true };
-    if (col.id === "link" || col.id === "link_resolvido") {
-      return {
-        id: col.id,
-        name: col.name,
-        formatter: (cell) => (cell ? gridjs.html(`<a href="${cell}" target="_blank" rel="noopener">Abrir</a>`) : ""),
-        sort: true,
-      };
-    }
-    return { id: col.id, name: col.name, sort: true };
-  });
 }
 
 function fillMultiBox(container, values, defaults = []) {
@@ -740,7 +662,7 @@ function renderAgGrid(key, cfg, rows) {
 function buildAgColumns(columns, selectedSet) {
   const safeSet = selectedSet && selectedSet.size ? selectedSet : new Set(columns.slice(0, DEFAULT_VISIBLE_COLS).map((c) => c.id));
   return columns.map((col) => {
-    if (col.id === "link") {
+    if (col.id === "link" || col.id === "link_resolvido") {
       return {
         headerName: col.name,
         field: col.id,
@@ -751,7 +673,28 @@ function buildAgColumns(columns, selectedSet) {
           link.href = params.value;
           link.target = "_blank";
           link.rel = "noopener";
-          link.textContent = "Abrir";
+          link.textContent = params.value; //Usar params.value para exibir URL do link ou então "Mais informações"
+          link.title = params.value;
+          return link;
+        },
+      };
+    }
+    if (LINKED_FIELDS.has(col.id)) {
+      return {
+        headerName: col.name,
+        field: col.id,
+        hide: !safeSet.has(col.id),
+        cellRenderer: (params) => {
+          const label = params.value ?? "";
+          const url = params.data?.link_resolvido;
+          if (!label) return "";
+          if (!url) return label;
+          const link = document.createElement("a");
+          link.href = url;
+          link.target = "_blank";
+          link.rel = "noopener";
+          link.textContent = label;
+          link.title = url;
           return link;
         },
       };

@@ -76,6 +76,83 @@ a {
   line-height: 1.5;
 }
 
+.hero__text {
+  margin: 0;
+  color: var(--secondary);
+  line-height: 1.6;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(37, 99, 235, 0.02));
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.audience-card {
+  background: linear-gradient(135deg, #f8fbff, #eef2ff);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 0.5rem;
+}
+
+.audience-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.audience-badge {
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary-strong);
+  background: #e3eaff;
+  border: 1px solid rgba(37, 99, 235, 0.35);
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+}
+
+.audience-dot {
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+  border-radius: 50%;
+  box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.12);
+}
+
+.audience-card__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.35rem;
+  color: var(--secondary);
+}
+
+.audience-card__list li {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  align-items: start;
+  gap: 0.35rem;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.55rem 0.65rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.audience-icon {
+  font-size: 1.05rem;
+}
+
+.audience-card__hint {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
 .hero__chips {
   display: flex;
   flex-wrap: wrap;
@@ -896,6 +973,13 @@ a {
   border-radius: 14px;
   padding: 1.2rem;
   box-shadow: var(--shadow);
+}
+
+.credits__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.25rem 0 0.75rem;
 }
 
 .credits__title {
