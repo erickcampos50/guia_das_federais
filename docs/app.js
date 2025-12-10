@@ -129,6 +129,11 @@ const lastData = {};
 const loadedTabs = new Set();
 const selectedColumns = {};
 let jsPdfPromise;
+const multiValuesStore = {};
+const multiFilteredStore = {};
+const multiRenderedStore = {};
+const multiSelections = {};
+const MULTI_RENDER_BATCH = 120;
 
 function buildPanels() {
   const root = document.getElementById("tabPanels");
@@ -416,13 +421,36 @@ function isMultiBox(el) {
 }
 
 function fillMultiBox(container, values, defaults = []) {
+  const id = container.id;
+  multiValuesStore[id] = values;
+  multiSelections[id] = new Set(defaults ?? []);
+  container.dataset.defaults = (defaults ?? []).join("||");
+  container.dataset.boundScroll = "false";
+  renderMultiOptions(container, "", true);
+  bindMultiEvents(container);
+  updateMultiStatus(container);
+}
+
+function renderMultiOptions(container, term = "", resetRendered = false) {
+  const id = container.id;
   const optionsWrapper = container.querySelector(".multi-options");
   if (!optionsWrapper) return;
-  const search = container.querySelector(".multi-search");
-  const defaultsSet = new Set(defaults ?? []);
+  const search = term ?? "";
+  const values = multiValuesStore[id] ?? [];
+  const filtered = !search
+    ? values
+    : values.filter((val) => val.toLowerCase().includes(search.toLowerCase()));
+  multiFilteredStore[id] = filtered;
+  if (resetRendered) {
+    multiRenderedStore[id] = 0;
+    optionsWrapper.innerHTML = "";
+  }
+  const start = multiRenderedStore[id] ?? 0;
+  const end = Math.min(filtered.length, start + MULTI_RENDER_BATCH);
+  const selections = multiSelections[id] ?? new Set();
 
-  optionsWrapper.innerHTML = "";
-  values.forEach((val, idx) => {
+  for (let i = start; i < end; i++) {
+    const val = filtered[i];
     const label = document.createElement("label");
     label.className = "form-check d-flex align-items-center gap-2 py-1";
 
@@ -430,8 +458,8 @@ function fillMultiBox(container, values, defaults = []) {
     checkbox.type = "checkbox";
     checkbox.className = "form-check-input";
     checkbox.value = val;
-    checkbox.id = `${container.id}-${idx}`;
-    checkbox.checked = defaultsSet.has(val);
+    checkbox.id = `${id}-${i}`;
+    checkbox.checked = selections.has(val);
 
     const span = document.createElement("span");
     span.className = "form-check-label ms-2 flex-grow-1";
@@ -441,56 +469,76 @@ function fillMultiBox(container, values, defaults = []) {
     label.appendChild(checkbox);
     label.appendChild(span);
     optionsWrapper.appendChild(label);
-  });
+  }
+
+  multiRenderedStore[id] = end;
+  updateMultiStatus(container);
+}
+
+function bindMultiEvents(container) {
+  const optionsWrapper = container.querySelector(".multi-options");
+  if (!optionsWrapper) return;
+  const search = container.querySelector(".multi-search");
 
   if (search && !search.dataset.boundSearch) {
-    search.addEventListener("input", () => filterMultiBox(container, search.value));
+    search.addEventListener("input", () => {
+      renderMultiOptions(container, search.value, true);
+    });
     search.dataset.boundSearch = "true";
   }
 
   if (!optionsWrapper.dataset.boundChange) {
     optionsWrapper.addEventListener("change", (ev) => {
       if (ev.target && ev.target.matches('input[type="checkbox"]')) {
+        const id = container.id;
+        const val = ev.target.value;
+        const set = multiSelections[id] ?? new Set();
+        if (ev.target.checked) {
+          set.add(val);
+        } else {
+          set.delete(val);
+        }
+        multiSelections[id] = set;
         updateMultiStatus(container);
       }
     });
     optionsWrapper.dataset.boundChange = "true";
   }
 
-  updateMultiStatus(container);
+  if (optionsWrapper.dataset.boundScroll !== "true") {
+    optionsWrapper.addEventListener("scroll", () => {
+      const id = container.id;
+      const rendered = multiRenderedStore[id] ?? 0;
+      const filtered = multiFilteredStore[id] ?? [];
+      if (rendered >= filtered.length) return;
+      const nearBottom = optionsWrapper.scrollTop + optionsWrapper.clientHeight >= optionsWrapper.scrollHeight - 50;
+      if (nearBottom) {
+        renderMultiOptions(container, search?.value ?? "", false);
+      }
+    });
+    optionsWrapper.dataset.boundScroll = "true";
+  }
 }
 
 function filterMultiBox(container, term) {
-  const normalized = term.trim().toLowerCase();
-  let visible = 0;
-  container.querySelectorAll(".form-check").forEach((row) => {
-    const text = row.textContent.toLowerCase();
-    const show = !normalized || text.includes(normalized);
-    row.style.display = show ? "" : "none";
-    if (show) visible++;
-  });
-  updateMultiStatus(container, visible);
+  renderMultiOptions(container, term, true);
 }
 
-function updateMultiStatus(container, visibleCount) {
+function updateMultiStatus(container) {
   const statusEl = container.querySelector(".multi-status");
   if (!statusEl) return;
-  const rows = Array.from(container.querySelectorAll(".form-check"));
-  const total = rows.length;
-  const selected = container.querySelectorAll('input[type="checkbox"]:checked').length;
-  const visible =
-    visibleCount ??
-    rows.filter((row) => {
-      const style = row.style.display;
-      return style !== "none";
-    }).length;
+  const id = container.id;
+  const values = multiValuesStore[id] ?? [];
+  const filtered = multiFilteredStore[id] ?? values;
+  const rendered = Math.min(multiRenderedStore[id] ?? filtered.length, filtered.length);
+  const selected = (multiSelections[id]?.size) ?? 0;
   const term = container.querySelector(".multi-search")?.value.trim();
-  if (!total) {
+  if (!values.length) {
     statusEl.textContent = "Nenhum resultado";
     return;
   }
   const termText = term ? ` para "${term}"` : "";
-  statusEl.textContent = `Mostrando ${visible}/${total}${termText} • Selecionados ${selected}`;
+  statusEl.textContent = `Mostrando ${rendered}/${filtered.length}${termText} • Selecionados ${selected}`;
 }
 
 function wireNavigation() {
@@ -546,23 +594,16 @@ function clearFilters(key) {
 function resetMulti(id, defaults = []) {
   const el = document.getElementById(id);
   if (!el) return;
-  const defaultSet = new Set(defaults ?? []);
-
   if (isMultiBox(el)) {
-    el.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
-      cb.checked = defaultSet.has(cb.value);
-    });
+    multiSelections[id] = new Set(defaults ?? []);
     const search = el.querySelector(".multi-search");
-    if (search) {
-      search.value = "";
-      filterMultiBox(el, "");
-    } else {
-      updateMultiStatus(el);
-    }
+    if (search) search.value = "";
+    renderMultiOptions(el, "", true);
     return;
   }
 
   if (el.tagName === "SELECT") {
+    const defaultSet = new Set(defaults ?? []);
     Array.from(el.options).forEach((opt) => (opt.selected = defaultSet.has(opt.value)));
   }
 }
@@ -626,6 +667,7 @@ function getMultiValues(id) {
   const el = document.getElementById(id);
   if (!el) return [];
   if (isMultiBox(el)) {
+    if (multiSelections[id]) return Array.from(multiSelections[id]);
     return Array.from(el.querySelectorAll('input[type="checkbox"]:checked')).map((cb) => cb.value);
   }
   if (el.tagName === "SELECT") {
