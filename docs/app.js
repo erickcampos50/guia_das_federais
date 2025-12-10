@@ -90,16 +90,17 @@ const datasets = {
     prefix: "pos",
     label: "Mestrado/Doutorado",
     table: "pos",
-    orderBy: "nome_programa, sigla_ies, municipio",
+    orderBy: "nome_programa, sigla_ies, nivel_programa, municipio",
     columns: [
       { id: "sigla_ies", name: "Sigla Instituição" },
       { id: "nome_programa", name: "Programa" },
+      { id: "nivel_programa", name: "Nível" },
       { id: "municipio", name: "Município" },
       { id: "uf", name: "UF" },
       { id: "area_conhecimento", name: "Área de conhecimento" },
       { id: "nota_conceito", name: "Nota" },
       { id: "nome_ies", name: "Instituição" },
-      { id: "nivel_programa", name: "Nível" },
+      
       { id: "modalidade", name: "Modalidade" },
       { id: "link_resolvido", name: "Link Automático" },
       { id: "link", name: "Link Capes" },
@@ -127,6 +128,7 @@ const gridInstances = {};
 const lastData = {};
 const loadedTabs = new Set();
 const selectedColumns = {};
+let jsPdfPromise;
 
 function buildPanels() {
   const root = document.getElementById("tabPanels");
@@ -156,9 +158,11 @@ function buildPanels() {
     const btnFilter = section.querySelector('[data-role="filtrar"]');
     const btnClear = section.querySelector('[data-role="limpar"]');
     const btnDownload = section.querySelector('[data-role="download"]');
+    const btnDownloadPdf = section.querySelector('[data-role="download-pdf"]');
     btnFilter.id = `${cfg.prefix}-filtrar`;
     btnClear.id = `${cfg.prefix}-limpar`;
     btnDownload.id = `${cfg.prefix}-download`;
+    if (btnDownloadPdf) btnDownloadPdf.id = `${cfg.prefix}-download-pdf`;
 
     const gridTitle = section.querySelector("[data-grid-title]");
     const gridBody = section.querySelector("[data-grid-body]");
@@ -518,6 +522,10 @@ function wireButtons() {
       runQuery(key);
     });
     document.getElementById(`${cfg.prefix}-download`).addEventListener("click", () => downloadCsv(key));
+    const pdfBtn = document.getElementById(`${cfg.prefix}-download-pdf`);
+    if (pdfBtn) {
+      pdfBtn.addEventListener("click", () => downloadPdf(key));
+    }
   });
 }
 
@@ -655,8 +663,8 @@ function renderAgGrid(key, cfg, rows) {
     onFirstDataRendered: (params) => params.api.sizeColumnsToFit(),
     onGridSizeChanged: (params) => params.api.sizeColumnsToFit(),
   };
-  new agGrid.Grid(container, gridOptions);
-  gridInstances[key] = gridOptions;
+  const api = agGrid.createGrid(container, gridOptions);
+  gridInstances[key] = { api };
 }
 
 function buildAgColumns(columns, selectedSet) {
@@ -728,11 +736,141 @@ function downloadCsv(key) {
     )
   );
   const blob = new Blob([csv.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const filename = `Lista de cursos - ${key}.csv`;
+  shareFile(filename, blob).then((shared) => {
+    if (!shared) downloadBlob(filename, blob);
+  });
+}
+
+async function downloadPdf(key) {
+  const rows = lastData[key] ?? [];
+  if (!rows.length) {
+    alert("Nenhum dado para exportar. Rode uma consulta antes.");
+    return;
+  }
+  const selected = getSelectedColumns(key);
+  const headers = selected.map((id) => datasets[key].columns.find((c) => c.id === id)?.name || id);
+  const previewRows = rows.slice(0, 400);
+  try {
+    const jsPDF = await loadJsPdf();
+    const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+    const margin = 36;
+    const pageWidth = doc.internal.pageSize.getWidth() - margin * 2;
+    const pageHeight = doc.internal.pageSize.getHeight();
+    let y = margin + 14;
+
+    doc.setFontSize(14);
+    doc.text(`Resultados filtrados cursos – ${datasets[key].label}`, margin, y);
+    y += 18;
+    doc.setFontSize(10);
+
+    const makeLine = (idx, row) => {
+      const parts = headers.map((label, i) => `${label}: ${row[selected[i]] ?? ""}`);
+      return `${idx + 1}. ${parts.join("  |  ")}`;
+    };
+
+    previewRows.forEach((row, idx) => {
+      const text = makeLine(idx, row);
+      const wrapped = doc.splitTextToSize(text, pageWidth);
+      if (y + wrapped.length * 12 > pageHeight - margin) {
+        doc.addPage();
+        y = margin;
+      }
+      doc.text(wrapped, margin, y);
+      y += wrapped.length * 12 + 6;
+    });
+
+    if (rows.length > previewRows.length) {
+      if (y + 24 > pageHeight - margin) {
+        doc.addPage();
+        y = margin;
+      }
+      doc.setFontSize(9);
+      doc.text(`Exibindo ${previewRows.length} de ${rows.length} registros. Baixe a planilha para a lista completa.`, margin, y + 6);
+    }
+
+    const filename = `Lista de cursos - ${key}.pdf`;
+    const pdfBlob = doc.output("blob");
+    const shared = await shareFile(filename, pdfBlob);
+    if (!shared) {
+      downloadBlob(filename, pdfBlob);
+    }
+  } catch (err) {
+    console.error("Erro ao gerar PDF", err);
+    alert("Não foi possível gerar o PDF agora. Tente baixar a planilha CSV.");
+  }
+}
+
+async function loadJsPdf() {
+  if (!jsPdfPromise) {
+    jsPdfPromise = (async () => {
+      if (window.jspdf?.jsPDF) return window.jspdf.jsPDF;
+      try {
+        await loadScriptOnce("jspdf-umd", "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js");
+        if (window.jspdf?.jsPDF) return window.jspdf.jsPDF;
+      } catch (err) {
+        console.warn("Falha ao carregar jsPDF UMD", err);
+      }
+      throw new Error("jsPDF não disponível no momento.");
+    })();
+  }
+  return jsPdfPromise;
+}
+
+function loadScriptOnce(id, src) {
+  return new Promise((resolve, reject) => {
+    if (document.getElementById(id)) {
+      const existing = document.getElementById(id);
+      if (existing.dataset.loaded === "true") return resolve();
+      existing.addEventListener("load", () => resolve());
+      existing.addEventListener("error", (e) => reject(e));
+      return;
+    }
+    const script = document.createElement("script");
+    script.id = id;
+    script.src = src;
+    script.async = true;
+    script.onload = () => {
+      script.dataset.loaded = "true";
+      resolve();
+    };
+    script.onerror = (e) => reject(e);
+    document.head.appendChild(script);
+  });
+}
+
+async function shareFile(filename, blob) {
+  try {
+    if (!isSmallScreen()) return false;
+    if (!navigator.canShare || !navigator.canShare({ files: [new File([blob], filename, { type: blob.type })] })) {
+      return false;
+    }
+    const file = new File([blob], filename, { type: blob.type });
+    await navigator.share({
+      files: [file],
+      title: filename,
+      text: "Compartilhado a partir do Guia das Federais",
+    });
+    return true;
+  } catch (err) {
+    console.warn("Compartilhamento não disponível", err);
+    return false;
+  }
+}
+
+function downloadBlob(filename, blob) {
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
-  link.download = `${key}.csv`;
+  link.download = filename;
   link.click();
   URL.revokeObjectURL(link.href);
+}
+
+function isSmallScreen() {
+  if (window.matchMedia) {
+    return window.matchMedia("(max-width: 900px)").matches;
+  }
+  return Math.min(window.innerWidth || 0, window.innerHeight || 0) <= 900;
 }
 
 function setStatus(text) {

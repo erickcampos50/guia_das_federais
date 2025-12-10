@@ -39,27 +39,9 @@
             <span class="chip chip--accent">Monte sua lista para decidir com calma</span>
           </div>
           <div class="hero__steps">
-            <div class="step">
-              <span class="step__icon">1</span>
-              <div>
-                <p class="step__title">Escolha a etapa da jornada</p>
-                <p class="step__text">Graduação para começar, Especialização para aprofundar ou Pós‑Graduação para seguir na pesquisa acadêmica.</p>
-              </div>
-            </div>
-            <div class="step">
-              <span class="step__icon">2</span>
-              <div>
-                <p class="step__title">Ajuste os filtros ao seu momento</p>
-                <p class="step__text">Combine estado, cidade, área e instituição para encontrar cursos que cabem na sua realidade e nos seus sonhos.</p>
-              </div>
-            </div>
-            <div class="step">
-              <span class="step__icon">3</span>
-              <div>
-                <p class="step__title">Escolha o que a tabela mostra</p>
-                <p class="step__text">Ative as colunas que importam — vagas, duração, carga horária, nível, nota — e compare cursos lado a lado.</p>
-              </div>
-            </div>
+            
+         
+            
           </div>
 
           <details class="hero__details">
@@ -169,20 +151,28 @@
             <div id="status" class="small text-muted hero__status">Carregando...</div>
           </details>
         </div>
-        <div class="hero__visual">
-          <div class="hero__blob"></div>
-          <div class="hero__card">
-            <p class="label">CONSULTE</p>
-            <p class="value">+5.000</p>
-            <p class="hint">cursos em universidades estaduais e federais</p>
-          </div>
-          <div class="hero__card hero__card--alt">
-            <p class="label">ENCONTRE</p>
-            <p class="value">+1000</p>
-            <p class="hint">mestrados e doutorados gratuitos</p>
-          </div>
+      <div class="hero__visual">
+        <div class="hero__blob"></div>
+        <div class="hero__card">
+          <p class="label">CONSULTE</p>
+          <p class="value">+5.000</p>
+          <p class="hint">cursos em universidades estaduais e federais</p>
         </div>
-      </header>
+        <div class="hero__card hero__card--alt">
+          <p class="label">ENCONTRE</p>
+          <p class="value">+1000</p>
+          <p class="hint">mestrados e doutorados gratuitos</p>
+        </div>
+      </div>
+    </header>
+    
+      <div class="step step--nav mb-3">
+        <span class="step__icon">1</span>
+        <div>
+          <p class="step__title">Escolha a categoria das opções que deseja ver</p>
+          <p class="step__text">Graduação para começar, Especialização para aprofundar ou Mestrado/Doutorado para seguir na pesquisa acadêmica.</p>
+        </div>
+      </div>
 
       <nav class="nav nav-pills gap-2 mb-3 flex-column flex-md-row" id="tabNav">
         <button class="btn btn-outline-primary active w-100 w-md-auto" data-tab="graduacao" type="button">Graduação</button>
@@ -196,25 +186,45 @@
         <section class="tab-panel d-none">
           <div class="card mb-3">
             <div class="card-body">
+              <div class="step mb-2">
+                <span class="step__icon">2</span>
+                <div>
+                  <p class="step__title">Ajuste os filtros para definir quais informações vão aparecer</p>
+                  <p class="step__text">Combine estado, cidade, área e instituição para encontrar cursos que cabem na sua realidade e nos seus sonhos.</p>
+                </div>
+              </div>
               <details class="filters-accordion">
                 <summary></summary>
                 <div class="row g-3" data-filter-fields></div>
                 <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 mt-3 filter-actions">
-                  <button class="btn btn-primary w-100 w-md-auto" data-role="filtrar" type="button">Aplicar filtros</button>
-                  <button class="btn btn-outline-secondary w-100 w-md-auto" data-role="limpar" type="button">Limpar filtros</button>
+                  <button class="btn btn-primary w-100 w-md-auto" data-role="filtrar" type="button">Ver resultados filtrados</button>
+                  <button class="btn btn-outline-secondary w-100 w-md-auto" data-role="limpar" type="button">Limpar todas as opções</button>
                 </div>
               </details>
+            </div>
+          </div>
+
+          <div class="grid-card">
+            <div class="grid-card__header">
+              <div>
+                <div class="grid-card__title" data-grid-title></div>
+                <div class="step step--compact">
+                  <span class="step__icon">3</span>
+                  <div>
+                    <p class="step__title">Escolha o que a tabela mostra</p>
+                    <p class="step__text">Ative as colunas que importam pra você (vagas, duração, carga horária, nível, nota, etc.) pra ficar mais fácil encontrar a melhor opção.</p>
+                  </div>
+                </div>
+              </div>
               <div class="column-picker" data-column-picker>
                 <p class="column-picker__title">Quais colunas você quer ver?</p>
                 <div class="column-picker__options" data-column-options></div>
               </div>
             </div>
-          </div>
-          <div class="grid-card">
-            <div class="grid-card__title" data-grid-title></div>
             <div class="grid-card__body ag-theme-quartz" data-grid-body></div>
             <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 mt-3 filter-actions">
-              <button class="btn btn-outline-success w-100 w-md-auto ms-md-auto" data-role="download" type="button">Baixar resultados numa planilha</button>
+              <button class="btn btn-download w-100 w-md-auto ms-md-auto" data-role="download" type="button">Baixar/Compartilhar planilha CSV</button>
+              <button class="btn btn-download-alt w-100 w-md-auto" data-role="download-pdf" type="button">Baixar/Compartilhar resultados em PDF</button>
             </div>
           </div>
         </section>
