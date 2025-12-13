@@ -25,7 +25,7 @@ const datasets = {
     ],
     filters: [
       { type: "multi", id: "grad-curso", column: "nome_curso", operator: "like", label: "Nome do curso", placeholder: "Filtrar curso" },
-      { type: "multi", id: "grad-area", column: "area_conhecimento", label: "Área de conhecimento", placeholder: "Filtrar área" },
+      // { type: "multi", id: "grad-area", column: "area_conhecimento", label: "Área de conhecimento", placeholder: "Filtrar área" },
       { type: "multi", id: "grad-ies", column: "nome_ies", label: "Instituição", placeholder: "Filtrar instituição" },
       { type: "multi", id: "grad-uf", column: "uf", label: "UF", placeholder: "Filtrar estado" },
       { type: "multi", id: "grad-municipio", column: "municipio", label: "Município", placeholder: "Filtrar município" },
@@ -134,6 +134,8 @@ const multiFilteredStore = {};
 const multiRenderedStore = {};
 const multiSelections = {};
 const MULTI_RENDER_BATCH = 120;
+const FILTER_DEBOUNCE = 240;
+const applyTimers = {};
 
 function buildPanels() {
   const root = document.getElementById("tabPanels");
@@ -156,7 +158,7 @@ function buildPanels() {
     `;
     const fields = section.querySelector("[data-filter-fields]");
     cfg.filters.forEach((filter) => {
-      const node = renderFilterField(filter);
+      const node = renderFilterField(filter, key);
       if (node) fields.appendChild(node);
     });
 
@@ -164,9 +166,9 @@ function buildPanels() {
     const btnClear = section.querySelector('[data-role="limpar"]');
     const btnDownload = section.querySelector('[data-role="download"]');
     const btnDownloadPdf = section.querySelector('[data-role="download-pdf"]');
-    btnFilter.id = `${cfg.prefix}-filtrar`;
-    btnClear.id = `${cfg.prefix}-limpar`;
-    btnDownload.id = `${cfg.prefix}-download`;
+    if (btnFilter) btnFilter.id = `${cfg.prefix}-filtrar`;
+    if (btnClear) btnClear.id = `${cfg.prefix}-limpar`;
+    if (btnDownload) btnDownload.id = `${cfg.prefix}-download`;
     if (btnDownloadPdf) btnDownloadPdf.id = `${cfg.prefix}-download-pdf`;
 
     const gridTitle = section.querySelector("[data-grid-title]");
@@ -239,12 +241,12 @@ function refreshGridColumns(key) {
   grid.api.sizeColumnsToFit();
 }
 
-function renderFilterField(filter) {
+function renderFilterField(filter, datasetKey) {
   if (filter.type === "multi") {
     const wrap = document.createElement("div");
     wrap.className = "col-md-3";
     wrap.appendChild(buildLabel(filter.label ?? filter.id, filter.id));
-    wrap.appendChild(buildMultiBox(filter.id, filter.placeholder ?? "Filtrar"));
+    wrap.appendChild(buildMultiBox(filter.id, filter.placeholder ?? "Filtrar", datasetKey));
     return wrap;
   }
   if (filter.type === "text") {
@@ -256,13 +258,14 @@ function renderFilterField(filter) {
     input.type = "text";
     input.className = "form-control";
     input.placeholder = filter.placeholder ?? "";
+    if (datasetKey) input.dataset.datasetKey = datasetKey;
     wrap.appendChild(input);
     return wrap;
   }
   if (filter.type === "range") {
     const frag = document.createDocumentFragment();
-    frag.appendChild(buildNumberField(filter.minId, filter.labelMin ?? "Mínimo", filter.placeholderMin));
-    frag.appendChild(buildNumberField(filter.maxId, filter.labelMax ?? "Máximo", filter.placeholderMax));
+    frag.appendChild(buildNumberField(filter.minId, filter.labelMin ?? "Mínimo", filter.placeholderMin, datasetKey));
+    frag.appendChild(buildNumberField(filter.maxId, filter.labelMax ?? "Máximo", filter.placeholderMax, datasetKey));
     return frag;
   }
   return null;
@@ -276,11 +279,12 @@ function buildLabel(text, forId) {
   return label;
 }
 
-function buildMultiBox(id, placeholder) {
+function buildMultiBox(id, placeholder, datasetKey) {
   const box = document.createElement("div");
   box.className = "multi-box";
   box.dataset.multibox = "true";
   box.id = id;
+  if (datasetKey) box.dataset.datasetKey = datasetKey;
 
   const search = document.createElement("input");
   search.type = "search";
@@ -299,7 +303,7 @@ function buildMultiBox(id, placeholder) {
   return box;
 }
 
-function buildNumberField(id, labelText, placeholder) {
+function buildNumberField(id, labelText, placeholder, datasetKey) {
   const wrap = document.createElement("div");
   wrap.className = "col-md-3";
   wrap.appendChild(buildLabel(labelText, id));
@@ -308,6 +312,7 @@ function buildNumberField(id, labelText, placeholder) {
   input.min = "0";
   input.id = id;
   input.className = "form-control";
+  if (datasetKey) input.dataset.datasetKey = datasetKey;
   if (placeholder) input.placeholder = placeholder;
   wrap.appendChild(input);
   return wrap;
@@ -330,7 +335,7 @@ async function init() {
   wireNavigation();
   wireButtons();
   wireResize();
-  await runQuery("graduacao");
+  await applyFilters("graduacao");
   loadedTabs.add("graduacao");
 }
 
@@ -500,6 +505,8 @@ function bindMultiEvents(container) {
         }
         multiSelections[id] = set;
         updateMultiStatus(container);
+        const key = getDatasetKeyFromFilter(id);
+        if (key) scheduleApply(key);
       }
     });
     optionsWrapper.dataset.boundChange = "true";
@@ -551,7 +558,7 @@ function wireNavigation() {
         panel.classList.toggle("d-none", panel.dataset.panel !== tab);
       });
       if (!loadedTabs.has(tab)) {
-        await runQuery(tab);
+        await applyFilters(tab);
         loadedTabs.add(tab);
       }
     });
@@ -560,20 +567,20 @@ function wireNavigation() {
 
 function wireButtons() {
   Object.entries(datasets).forEach(([key, cfg]) => {
-    document.getElementById(`${cfg.prefix}-filtrar`).addEventListener("click", async () => {
-      await runQuery(key);
-      collapseFilters(key);
-      focusGrid(key);
-    });
-    document.getElementById(`${cfg.prefix}-limpar`).addEventListener("click", () => {
-      clearFilters(key);
-      runQuery(key);
-    });
-    document.getElementById(`${cfg.prefix}-download`).addEventListener("click", () => downloadCsv(key));
+    const clearBtn = document.getElementById(`${cfg.prefix}-limpar`);
+    if (clearBtn) {
+      clearBtn.addEventListener("click", () => {
+        clearFilters(key);
+        applyFilters(key);
+      });
+    }
+    const downloadBtn = document.getElementById(`${cfg.prefix}-download`);
+    if (downloadBtn) downloadBtn.addEventListener("click", () => downloadCsv(key));
     const pdfBtn = document.getElementById(`${cfg.prefix}-download-pdf`);
     if (pdfBtn) {
       pdfBtn.addEventListener("click", () => downloadPdf(key));
     }
+    bindAutoFilterEvents(key, cfg);
   });
 }
 
@@ -583,10 +590,13 @@ function clearFilters(key) {
     if (filter.type === "multi") {
       resetMulti(filter.id, cfg.defaults?.[filter.id]);
     } else if (filter.type === "text") {
-      document.getElementById(filter.id).value = "";
+      const el = document.getElementById(filter.id);
+      if (el) el.value = "";
     } else if (filter.type === "range") {
-      document.getElementById(filter.minId).value = "";
-      document.getElementById(filter.maxId).value = "";
+      const minEl = document.getElementById(filter.minId);
+      const maxEl = document.getElementById(filter.maxId);
+      if (minEl) minEl.value = "";
+      if (maxEl) maxEl.value = "";
     }
   });
 }
@@ -625,10 +635,13 @@ async function runQuery(key) {
   setStatus(`Resultados ${cfg.label}: ${rows.length}.`);
 }
 
-function buildWhere(cfg) {
+function buildWhere(cfg, omitFilterId = null) {
   const clauses = [];
   const params = [];
   cfg.filters.forEach((filter) => {
+    if (omitFilterId && (filter.id === omitFilterId || filter.minId === omitFilterId || filter.maxId === omitFilterId)) {
+      return;
+    }
     if (filter.type === "multi") {
       const values = getMultiValues(filter.id);
       if (values.length) {
@@ -979,4 +992,82 @@ function wireResize() {
       if (grid?.api) grid.api.sizeColumnsToFit();
     });
   });
+}
+
+async function applyFilters(key) {
+  await runQuery(key);
+  await refreshFilterOptions(key);
+  focusGrid(key);
+}
+
+async function refreshFilterOptions(key) {
+  const cfg = datasets[key];
+  if (!cfg || !db) return;
+  for (const filter of cfg.filters) {
+    if (filter.type !== "multi") continue;
+    const { where, params } = buildWhere(cfg, filter.id);
+    const sql = `SELECT DISTINCT ${filter.column} AS value FROM ${cfg.table} ${where} ORDER BY ${filter.column}`;
+    const stmt = db.prepare(sql);
+    stmt.bind(params);
+    const values = [];
+    while (stmt.step()) {
+      const { value } = stmt.getAsObject();
+      if (value !== null && value !== "") values.push(value);
+    }
+    stmt.free();
+    refreshMultiBoxValues(filter.id, values);
+  }
+}
+
+function refreshMultiBoxValues(id, values) {
+  const box = document.getElementById(id);
+  if (!box || !isMultiBox(box)) return;
+  const allowed = new Set(values);
+  const current = multiSelections[id] ?? new Set();
+  current.forEach((val) => {
+    if (!allowed.has(val)) current.delete(val);
+  });
+  multiSelections[id] = current;
+  multiValuesStore[id] = values;
+  multiFilteredStore[id] = values;
+  multiRenderedStore[id] = 0;
+  const optionsWrapper = box.querySelector(".multi-options");
+  if (optionsWrapper) optionsWrapper.innerHTML = "";
+  renderMultiOptions(box, box.querySelector(".multi-search")?.value ?? "", true);
+}
+
+function bindAutoFilterEvents(key, cfg) {
+  cfg.filters.forEach((filter) => {
+    if (filter.type === "text") {
+      const input = document.getElementById(filter.id);
+      if (input && !input.dataset.boundAuto) {
+        input.addEventListener("input", () => scheduleApply(key));
+        input.dataset.boundAuto = "true";
+      }
+    } else if (filter.type === "range") {
+      const min = document.getElementById(filter.minId);
+      const max = document.getElementById(filter.maxId);
+      [min, max].forEach((field) => {
+        if (field && !field.dataset.boundAuto) {
+          field.addEventListener("input", () => scheduleApply(key));
+          field.dataset.boundAuto = "true";
+        }
+      });
+    } else if (filter.type === "multi") {
+      const box = document.getElementById(filter.id);
+      if (box) box.dataset.datasetKey = key;
+    }
+  });
+}
+
+function scheduleApply(key) {
+  if (applyTimers[key]) clearTimeout(applyTimers[key]);
+  applyTimers[key] = setTimeout(() => {
+    applyFilters(key);
+  }, FILTER_DEBOUNCE);
+}
+
+function getDatasetKeyFromFilter(id) {
+  const found = Object.entries(datasets).find(([, cfg]) => id.startsWith(`${cfg.prefix}-`));
+  return found ? found[0] : null;
 }

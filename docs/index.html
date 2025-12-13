@@ -159,15 +159,17 @@
       </div>
     </header>
     
-      <div class="step step--nav mb-3">
+    
+
+      <nav class="nav nav-pills gap-2 mb-3 flex-column flex-md-row" id="tabNav">
+
+          <div class="step step--compact step--nav mb-3">
         <span class="step__icon">1</span>
         <div>
           <p class="step__title">Escolha a categoria das opções que deseja ver</p>
           <p class="step__text">Graduação para começar, Especialização para aprofundar ou Mestrado/Doutorado para seguir na pesquisa acadêmica.</p>
         </div>
       </div>
-
-      <nav class="nav nav-pills gap-2 mb-3 flex-column flex-md-row" id="tabNav">
         <button class="btn btn-outline-primary active w-100 w-md-auto" data-tab="graduacao" type="button">Graduação</button>
         <button class="btn btn-outline-primary w-100 w-md-auto" data-tab="especializacao" type="button">Especialização</button>
         <button class="btn btn-outline-primary w-100 w-md-auto" data-tab="pos" type="button">Mestrado e Doutorado</button>
@@ -179,7 +181,7 @@
         <section class="tab-panel d-none">
           <div class="card mb-3">
             <div class="card-body">
-              <div class="step mb-2">
+              <div class="step step--compact mb-2">
                 <span class="step__icon">2</span>
                 <div>
                   <p class="step__title">Ajuste os filtros para definir quais informações vão aparecer</p>
@@ -191,7 +193,7 @@
                 <summary></summary>
                 <div class="row g-3" data-filter-fields></div>
                 <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 mt-3 filter-actions">
-                  <button class="btn btn-primary w-100 w-md-auto" data-role="filtrar" type="button">Ver resultados filtrados</button>
+                  <!-- <button class="btn btn-primary w-100 w-md-auto" data-role="filtrar" type="button">Ver resultados filtrados</button> -->
                   <button class="btn btn-outline-secondary w-100 w-md-auto" data-role="limpar" type="button">Limpar todas as opções</button>
                 </div>
               </details>
