@@ -982,7 +982,8 @@ function focusGrid(key) {
   const target = document.querySelector(`[data-grid-card="${key}"]`);
   if (target) {
     target.classList.add("grid-card--focus");
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
+    // target.scrollIntoView({ behavior: "smooth", block: "start" });
+    // Comentado: scroll automático desativado para evitar navegação forçada.
   }
 }
 
