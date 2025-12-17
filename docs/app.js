@@ -136,6 +136,21 @@ const multiSelections = {};
 const MULTI_RENDER_BATCH = 120;
 const FILTER_DEBOUNCE = 240;
 const applyTimers = {};
+let toastEnabled = false;
+let lastToastMessageIdx = -1;
+
+const ENCOURAGING_TOASTS = [
+  "Boa! Achei {n} resultados.",
+  "Aí sim — {n} opções pra você explorar.",
+  "Fechou! {n} resultados encontrados.",
+  "Olha só: {n} resultados pra comparar.",
+  "Tá ficando bom: {n} resultados.",
+  "Partiu escolher: {n} resultados.",
+  "Show! Temos {n} resultados.",
+  "Mandou bem nos filtros: {n} resultados.",
+  "Encontramos {n} caminhos possíveis.",
+  "Ajuste perfeito: {n} resultados.",
+];
 
 function buildPanels() {
   const root = document.getElementById("tabPanels");
@@ -337,6 +352,7 @@ async function init() {
   wireResize();
   await applyFilters("graduacao");
   loadedTabs.add("graduacao");
+  toastEnabled = true;
 }
 
 async function loadDatabase() {
@@ -630,9 +646,31 @@ async function runQuery(key) {
     rows.push(stmt.getAsObject());
   }
   stmt.free();
+
+  const countStmt = db.prepare(`SELECT COUNT(*) AS total FROM ${cfg.table} ${where}`);
+  countStmt.bind(params);
+  countStmt.step();
+  const { total } = countStmt.getAsObject();
+  countStmt.free();
+
   lastData[key] = rows;
   renderAgGrid(key, cfg, rows);
-  setStatus(`Resultados ${cfg.label}: ${rows.length}.`);
+  const totalNum = Number(total ?? 0);
+  setStatus(`Resultados ${cfg.label}: ${rows.length} (de ${totalNum.toLocaleString("pt-BR")}).`);
+  if (toastEnabled) {
+    showToast(pickEncouragingToast(totalNum));
+  }
+}
+
+function pickEncouragingToast(totalNum) {
+  const n = Number(totalNum ?? 0).toLocaleString("pt-BR");
+  if (!ENCOURAGING_TOASTS.length) return `Resultados: ${n}`;
+  let idx = Math.floor(Math.random() * ENCOURAGING_TOASTS.length);
+  if (ENCOURAGING_TOASTS.length > 1 && idx === lastToastMessageIdx) {
+    idx = (idx + 1) % ENCOURAGING_TOASTS.length;
+  }
+  lastToastMessageIdx = idx;
+  return ENCOURAGING_TOASTS[idx].replace("{n}", n);
 }
 
 function buildWhere(cfg, omitFilterId = null) {
@@ -969,6 +1007,24 @@ function isSmallScreen() {
 function setStatus(text) {
   const el = document.getElementById("status");
   if (el) el.textContent = text;
+}
+
+function showToast(text) {
+  let toast = document.getElementById("toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toast";
+    toast.className = "toast";
+    toast.setAttribute("role", "status");
+    toast.setAttribute("aria-live", "polite");
+    document.body.appendChild(toast);
+  }
+  toast.textContent = text;
+  toast.classList.add("toast--show");
+  clearTimeout(toast._hideTimer);
+  toast._hideTimer = setTimeout(() => {
+    toast.classList.remove("toast--show");
+  }, 2000);
 }
 
 function collapseFilters(key) {
